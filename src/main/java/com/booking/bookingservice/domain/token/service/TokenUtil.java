@@ -41,16 +41,16 @@ public class TokenUtil {
     }
 
     // isValid token
-    public boolean isValidAccessToken(String token) {
-        return isValidToken(token, accessSecretKey);
+    public boolean validateAccessToken(String token) {
+        return validateToken(token, accessSecretKey);
     }
 
-    public boolean isValidRefreshToken(String token) {
-        return isValidToken(token, refreshSecretKey);
+    public boolean validateRefreshToken(String token) {
+        return validateToken(token, refreshSecretKey);
     }
 
-    private boolean isValidToken(String token,
-                                        SecretKey secretKey) {
+    private boolean validateToken(String token,
+                                  SecretKey secretKey) {
         Jws<Claims> claimsJws = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
