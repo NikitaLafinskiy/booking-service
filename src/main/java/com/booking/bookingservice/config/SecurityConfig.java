@@ -1,5 +1,8 @@
 package com.booking.bookingservice.config;
 
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,16 +13,18 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.List;
-
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final UserDetailsService userDetailsService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -29,7 +34,7 @@ public class SecurityConfig {
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
-        // todo: set the user details service
+        provider.setUserDetailsService(userDetailsService);
         return provider;
     }
 
@@ -42,9 +47,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
         try {
             httpSecurity
-                    .cors(cors -> cors.configurationSource(_ -> {
+                    .cors(cors -> cors.configurationSource((request) -> {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
-                        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                        corsConfiguration.setAllowedMethods(List.of("GET",
+                                "POST",
+                                "PUT",
+                                "DELETE"));
                         corsConfiguration.setAllowedHeaders(List.of("*"));
                         return corsConfiguration;
                     }))

@@ -4,13 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import java.util.function.Function;
+import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.function.Function;
 
 @Service
 public class TokenUtil {
@@ -24,15 +23,16 @@ public class TokenUtil {
     }
 
     // generate a token
-    public static String generateAccessToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         return generateToken(authentication, accessSecretKey);
     }
 
-    public static String generateRefreshToken(Authentication authentication) {
+    public String generateRefreshToken(Authentication authentication) {
         return generateToken(authentication, refreshSecretKey);
     }
 
-    private static String generateToken(Authentication authentication, SecretKey secretKey) {
+    private String generateToken(Authentication authentication,
+                                        SecretKey secretKey) {
         return Jwts.builder()
                 .issuedAt(new Date())
                 // todo: add more claims
@@ -41,15 +41,16 @@ public class TokenUtil {
     }
 
     // isValid token
-    public static boolean isValidAccessToken(String token) {
+    public boolean isValidAccessToken(String token) {
         return isValidToken(token, accessSecretKey);
     }
 
-    public static boolean isValidRefreshToken(String token) {
+    public boolean isValidRefreshToken(String token) {
         return isValidToken(token, refreshSecretKey);
     }
 
-    private static boolean isValidToken(String token, SecretKey secretKey) {
+    private boolean isValidToken(String token,
+                                        SecretKey secretKey) {
         Jws<Claims> claimsJws = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
@@ -60,15 +61,19 @@ public class TokenUtil {
     // get attribute
     // todo: add more attribute retrieval methods
 
-    private static <T> T getAttributeFromAccessToken(String token, Function<Claims, T> claimsResolver) {
+    private <T> T getAttributeFromAccessToken(String token,
+                                                     Function<Claims, T> claimsResolver) {
         return getAttribute(token, accessSecretKey, claimsResolver);
     }
 
-    private static <T> T getAttributeFromRefreshToken(String token, Function<Claims, T> claimsResolver) {
+    private <T> T getAttributeFromRefreshToken(String token, Function<Claims,
+            T> claimsResolver) {
         return getAttribute(token, refreshSecretKey, claimsResolver);
     }
 
-    private static <T> T getAttribute(String token, SecretKey secretKey, Function<Claims, T> claimsResolver) {
+    private <T> T getAttribute(String token,
+                                      SecretKey secretKey,
+                                      Function<Claims, T> claimsResolver) {
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
