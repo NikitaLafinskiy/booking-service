@@ -24,16 +24,28 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            response.setContentType("application/json");
-
-            Map<String, Object> errors = new HashMap<>();
-            errors.put("status", response.getStatus());
-            errors.put("timestamp", System.currentTimeMillis());
-            errors.put("message", e.getLocalizedMessage());
+        } catch (JwtAuthenticationException e) {
+            Map<String, Object> errors = composeErrorResponse(e, e.getStatusCode().value());
 
             String jsonError = objectMapper.writeValueAsString(errors);
+            response.setStatus(e.getStatusCode().value());
+            response.setContentType("application/json");
+            response.getWriter().write(jsonError);
+        } catch (Exception e) {
+            Map<String, Object> errors = composeErrorResponse(e,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            String jsonError = objectMapper.writeValueAsString(errors);
+            response.setContentType("application/json");
             response.getWriter().write(jsonError);
         }
+    }
+
+    private Map<String, Object> composeErrorResponse(Exception e, int status) {
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("status", status);
+        errors.put("timestamp", System.currentTimeMillis());
+        errors.put("message", e.getLocalizedMessage());
+        return errors;
     }
 }

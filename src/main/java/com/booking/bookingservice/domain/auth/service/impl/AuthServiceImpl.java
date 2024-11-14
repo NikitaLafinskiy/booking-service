@@ -5,7 +5,9 @@ import com.booking.bookingservice.domain.auth.dto.LoginUserRequestDto;
 import com.booking.bookingservice.domain.auth.dto.RegisterUserRequestDto;
 import com.booking.bookingservice.domain.auth.mapper.AuthMapper;
 import com.booking.bookingservice.domain.auth.service.AuthService;
-import com.booking.bookingservice.domain.token.service.TokenUtil;
+import com.booking.bookingservice.domain.token.service.TokenService;
+import com.booking.bookingservice.domain.token.service.impl.TokenServiceImpl;
+import com.booking.bookingservice.domain.user.dto.UserDto;
 import com.booking.bookingservice.domain.user.model.User;
 import com.booking.bookingservice.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final AuthMapper authMapper;
-    private final TokenUtil tokenUtil;
+    private final TokenService tokenService;
 
     @Override
     public LoginResponseDto login(LoginUserRequestDto loginUserRequestDto) {
@@ -28,8 +30,11 @@ public class AuthServiceImpl implements AuthService {
                 loginUserRequestDto.getEmail(),
                 loginUserRequestDto.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        String accessToken = tokenUtil.generateAccessToken(authentication);
-        String refreshToken = tokenUtil.generateRefreshToken(authentication);
+        String accessToken = tokenService.generateToken(authentication,
+                TokenService.TokenType.ACCESS);
+        String refreshToken = tokenService.generateToken(authentication,
+                TokenService.TokenType.REFRESH);
+        tokenService.saveRefreshToken(refreshToken, (UserDto) authentication.getPrincipal());
         return new LoginResponseDto(accessToken, refreshToken);
     }
 
