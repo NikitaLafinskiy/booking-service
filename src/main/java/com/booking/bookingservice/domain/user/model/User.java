@@ -1,6 +1,5 @@
 package com.booking.bookingservice.domain.user.model;
 
-import com.booking.bookingservice.domain.token.model.RefreshToken;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

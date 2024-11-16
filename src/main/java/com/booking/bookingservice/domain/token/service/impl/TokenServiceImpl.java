@@ -11,6 +11,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -29,8 +30,8 @@ public class TokenServiceImpl implements TokenService {
     private static final String LAST_NAME_CLAIM = "lastName";
     private static final String AUTHORITIES_CLAIM = "authorities";
 
-    private static SecretKey accessSecretKey;
-    private static SecretKey refreshSecretKey;
+    private final SecretKey accessSecretKey;
+    private final SecretKey refreshSecretKey;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
@@ -41,8 +42,8 @@ public class TokenServiceImpl implements TokenService {
                             @Value("${jwt.refresh-secret}") String refreshSecret,
                             RefreshTokenRepository refreshTokenRepository,
                             UserRepository userRepository) {
-        accessSecretKey = Keys.hmacShaKeyFor(accessSecret.getBytes());
-        refreshSecretKey = Keys.hmacShaKeyFor(refreshSecret.getBytes());
+        accessSecretKey = Keys.hmacShaKeyFor(accessSecret.getBytes(StandardCharsets.UTF_8));
+        refreshSecretKey = Keys.hmacShaKeyFor(refreshSecret.getBytes(StandardCharsets.UTF_8));
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
     }

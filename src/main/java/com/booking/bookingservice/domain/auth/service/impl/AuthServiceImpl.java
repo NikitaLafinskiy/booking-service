@@ -6,7 +6,6 @@ import com.booking.bookingservice.domain.auth.dto.RegisterUserRequestDto;
 import com.booking.bookingservice.domain.auth.mapper.AuthMapper;
 import com.booking.bookingservice.domain.auth.service.AuthService;
 import com.booking.bookingservice.domain.token.service.TokenService;
-import com.booking.bookingservice.domain.token.service.impl.TokenServiceImpl;
 import com.booking.bookingservice.domain.user.dto.UserDto;
 import com.booking.bookingservice.domain.user.model.User;
 import com.booking.bookingservice.domain.user.repository.UserRepository;

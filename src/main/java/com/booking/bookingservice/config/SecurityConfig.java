@@ -1,7 +1,6 @@
 package com.booking.bookingservice.config;
 
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +38,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(List<AuthenticationProvider> authenticationProviders) {
+    public AuthenticationManager authenticationManager(
+            List<AuthenticationProvider> authenticationProviders) {
         return new ProviderManager(authenticationProviders);
     }
 
