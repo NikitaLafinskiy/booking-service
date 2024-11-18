@@ -1,5 +1,7 @@
 package com.booking.bookingservice.config;
 
+import com.booking.bookingservice.domain.security.filter.JwtAuthenticationFilter;
+import com.booking.bookingservice.exception.ExceptionHandlerFilter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -23,6 +27,8 @@ import org.springframework.web.cors.CorsConfiguration;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ExceptionHandlerFilter exceptionHandlerFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -57,9 +63,17 @@ public class SecurityConfig {
                         return corsConfiguration;
                     }))
                     .csrf(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/auth/**")
+                            .permitAll()
+                            .anyRequest()
+                            .authenticated())
                     .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
                             SessionCreationPolicy.STATELESS
-                    ));
+                    ))
+                    .addFilterBefore(jwtAuthenticationFilter,
+                            UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(exceptionHandlerFilter, LogoutFilter.class);
             return httpSecurity.build();
         } catch (Exception e) {
             throw new RuntimeException("Failed while configuring the security filter chain");

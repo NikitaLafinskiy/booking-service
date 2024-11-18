@@ -48,6 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             handleAuthenticationFailure(e.getMessage());
         }
+
+        filterChain.doFilter(request, response); // todo: !make the filter not run on open endpoints
     }
 
     private void handleTokenRefresh(HttpServletRequest request, HttpServletResponse response) {

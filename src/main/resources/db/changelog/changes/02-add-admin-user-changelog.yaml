@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-admin-user
+      author: nikita
+      changes:
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: email
+                  value: admin@booking.com
+              - column:
+                  name: first_name
+                  value: Admin
+              - column:
+                  name: last_name
+                  value: User
+              - column:
+                  name: password
+                  value: $2a$10$PoBv0vkg50PADNKQ3HA3TOsaTfwdmiJENW4BKRVjLxFEym7hBT00m
+
+        - sql:
+            sql: SET @admin_user_id = (SELECT id FROM users WHERE email = 'admin@booking.com');
+        - sql:
+            sql: SET @admin_role_id = (SELECT id FROM roles WHERE role = 'ADMIN');
+
+        - insert:
+            tableName: user_role
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: "@admin_user_id"
+              - column:
+                  name: role_id
+                  valueComputed: "@admin_role_id"
