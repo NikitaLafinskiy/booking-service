@@ -1,7 +1,7 @@
 package com.booking.bookingservice.config;
 
 import com.booking.bookingservice.domain.security.filter.JwtAuthenticationFilter;
-import com.booking.bookingservice.exception.ExceptionHandlerFilter;
+import com.booking.bookingservice.exception.handler.ExceptionHandlerFilter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +26,8 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    public static final String[] OPEN_REQUEST_MATCHES = new String[]{ "/auth/**" };
+
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
@@ -63,16 +65,16 @@ public class SecurityConfig {
                         return corsConfiguration;
                     }))
                     .csrf(AbstractHttpConfigurer::disable)
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/auth/**")
-                            .permitAll()
-                            .anyRequest()
-                            .authenticated())
                     .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
                             SessionCreationPolicy.STATELESS
                     ))
                     .addFilterBefore(jwtAuthenticationFilter,
                             UsernamePasswordAuthenticationFilter.class)
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers(OPEN_REQUEST_MATCHES)
+                            .permitAll()
+                            .anyRequest()
+                            .authenticated())
                     .addFilterBefore(exceptionHandlerFilter, LogoutFilter.class);
             return httpSecurity.build();
         } catch (Exception e) {

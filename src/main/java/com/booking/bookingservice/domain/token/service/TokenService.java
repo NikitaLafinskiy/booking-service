@@ -6,13 +6,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 public interface TokenService {
-    void saveRefreshToken(String token, UserDto userDto);
+    void saveRefreshToken(String token, String user);
 
     String generateToken(Authentication authentication, TokenService.TokenType tokenType);
 
     boolean validateToken(String token, TokenService.TokenType tokenType);
 
-    UserDto getUserFromToken(String token, TokenService.TokenType tokenType);
+    UserDto getUserDtoFromToken(String token, TokenService.TokenType tokenType);
 
     Collection<? extends GrantedAuthority> getAuthoritiesFromToken(
             String token,

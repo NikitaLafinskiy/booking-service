@@ -35,8 +35,11 @@ public class TokenServiceImpl implements TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
-    @Value("${jwt.expiration}")
-    private int jwtExpiration;
+    @Value("${jwt.refresh-expiration}")
+    private String jwtRefreshExpiration;
+
+    @Value("${jwt.access-expiration}")
+    private String jwtAccessExpiration;
 
     public TokenServiceImpl(@Value("${jwt.access-secret}") String accessSecret,
                             @Value("${jwt.refresh-secret}") String refreshSecret,
@@ -48,11 +51,11 @@ public class TokenServiceImpl implements TokenService {
         this.userRepository = userRepository;
     }
 
-    public void saveRefreshToken(String token, UserDto userDto) {
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
+    public void saveRefreshToken(String token, String userEmail) {
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() ->
                 new EntityNotFoundException(
                         "User with an email of "
-                                + userDto.getEmail()
+                                + userEmail
                                 + " not found"));
         refreshTokenRepository.save(new RefreshToken(token, user));
     }
@@ -64,6 +67,8 @@ public class TokenServiceImpl implements TokenService {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
+        long jwtExpiration = Long.valueOf(tokenType == TokenType.ACCESS ? jwtAccessExpiration
+                : jwtRefreshExpiration);
 
         return Jwts.builder()
                 .issuedAt(new Date())
@@ -86,7 +91,7 @@ public class TokenServiceImpl implements TokenService {
         return claimsJws.getPayload().getExpiration().after(new Date());
     }
 
-    public UserDto getUserFromToken(String token, TokenService.TokenType tokenType) {
+    public UserDto getUserDtoFromToken(String token, TokenService.TokenType tokenType) {
         return getAttribute(token, tokenType, claims -> {
             UserDto user = new UserDto();
             user.setId(Long.parseLong(claims.getSubject()));

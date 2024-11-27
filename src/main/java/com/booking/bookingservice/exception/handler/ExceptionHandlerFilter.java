@@ -1,5 +1,6 @@
-package com.booking.bookingservice.exception;
+package com.booking.bookingservice.exception.handler;
 
+import com.booking.bookingservice.exception.JwtAuthenticationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

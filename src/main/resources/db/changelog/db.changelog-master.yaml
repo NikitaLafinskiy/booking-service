@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
-      file: classpath:db/changelog/changes/01-init-changelog.yaml
+      file: classpath:db/changelog/changes/01-security-init-changelog.yaml
+  - include:
+      file: classpath:db/changelog/changes/02-add-user-roles.yaml
+  - include:
+      file: classpath:db/changelog/changes/03-add-admin-user-changelog.yaml

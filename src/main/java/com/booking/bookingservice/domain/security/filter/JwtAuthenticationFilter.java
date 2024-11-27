@@ -1,5 +1,6 @@
 package com.booking.bookingservice.domain.security.filter;
 
+import com.booking.bookingservice.config.SecurityConfig;
 import com.booking.bookingservice.domain.token.repository.RefreshTokenRepository;
 import com.booking.bookingservice.domain.token.service.TokenService;
 import com.booking.bookingservice.domain.user.dto.UserDto;
@@ -9,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,16 +18,28 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Service
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final String PATH_PREFIX = "/api/";
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final String REFRESH_TOKEN_HEADER = "Refresh-Token";
+
     private final TokenService tokenService;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        AntPathMatcher matcher = new AntPathMatcher();
+        String requestPath = request.getRequestURI();
+
+        return Arrays.stream(SecurityConfig.OPEN_REQUEST_MATCHES)
+                .anyMatch((pattern) -> matcher.match(PATH_PREFIX + pattern, requestPath));
+    }
 
     @Override
     protected void doFilterInternal(
@@ -41,15 +55,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (tokenService.validateToken(accessToken, TokenService.TokenType.ACCESS)) {
                 processValidAccessToken(accessToken);
                 filterChain.doFilter(request, response);
-                return;
             }
-
-            handleTokenRefresh(request, response);
-        } catch (Exception e) {
-            handleAuthenticationFailure(e.getMessage());
+        } catch (Exception exception) {
+            try {
+                handleTokenRefresh(request, response);
+            } catch (Exception e) {
+                handleAuthenticationFailure(e.getMessage());
+            }
         }
-
-        filterChain.doFilter(request, response); // todo: !make the filter not run on open endpoints
     }
 
     private void handleTokenRefresh(HttpServletRequest request, HttpServletResponse response) {
@@ -72,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             refreshTokenRepository.delete(token);
             tokenService.saveRefreshToken(newRefreshToken,
-                    (UserDto) authentication.getPrincipal());
+                    ((UserDto) authentication.getPrincipal()).getEmail());
 
             response.setHeader(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + newAccessToken);
             response.setHeader(REFRESH_TOKEN_HEADER, TOKEN_PREFIX + newRefreshToken);
@@ -94,7 +107,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private Authentication getAuthenticationFromToken(String token,
                                                       TokenService.TokenType tokenType) {
         return new UsernamePasswordAuthenticationToken(
-                tokenService.getUserFromToken(token, tokenType),
+                tokenService.getUserDtoFromToken(token, tokenType),
                 null,
                 tokenService.getAuthoritiesFromToken(token, tokenType));
     }

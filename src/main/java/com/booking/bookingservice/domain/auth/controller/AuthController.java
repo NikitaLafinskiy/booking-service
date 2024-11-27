@@ -4,6 +4,7 @@ import com.booking.bookingservice.domain.auth.dto.LoginResponseDto;
 import com.booking.bookingservice.domain.auth.dto.LoginUserRequestDto;
 import com.booking.bookingservice.domain.auth.dto.RegisterUserRequestDto;
 import com.booking.bookingservice.domain.auth.service.AuthService;
+import com.booking.bookingservice.domain.user.dto.UserDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@RequestBody @Valid RegisterUserRequestDto registerUserRequestDto) {
-        authService.register(registerUserRequestDto);
+    public UserDto register(@RequestBody @Valid RegisterUserRequestDto registerUserRequestDto) {
+        return authService.register(registerUserRequestDto);
     }
 }
