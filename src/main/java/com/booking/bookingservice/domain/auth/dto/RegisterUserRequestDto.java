@@ -1,6 +1,6 @@
 package com.booking.bookingservice.domain.auth.dto;
 
-import com.booking.bookingservice.validator.FieldMatch;
+import com.booking.bookingservice.validator.fieldmatch.FieldMatch;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

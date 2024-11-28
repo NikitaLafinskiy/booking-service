@@ -1,0 +1,80 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1732789502304-1
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_accommodation
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: location
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: size
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: daily_rate
+                  type: DECIMAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: availability
+                  type: INT
+            tableName: accommodation
+  - changeSet:
+      id: 1732789502304-2
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_amenity
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: accommodation_id
+                  type: BIGINT
+            tableName: amenity
+  - changeSet:
+      id: 1732789502304-3
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: accommodation_id
+            baseTableName: amenity
+            constraintName: FK_AMENITY_ON_ACCOMMODATION
+            referencedColumnNames: id
+            referencedTableName: accommodation
+

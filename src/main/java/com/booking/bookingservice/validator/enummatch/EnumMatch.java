@@ -1,4 +1,4 @@
-package com.booking.bookingservice.validator;
+package com.booking.bookingservice.validator.enummatch;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -8,16 +8,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Constraint(validatedBy = FieldMatchValidator.class)
-public @interface FieldMatch {
-    String message() default "Field values don't match!";
-
-    Class<?>[] groups() default {};
+@Target(ElementType.FIELD)
+@Constraint(validatedBy = EnumMatchValidator.class)
+public @interface EnumMatch {
+    String message() default "The value provided is not allowed.";
 
     Class<? extends Payload>[] payload() default {};
 
-    String firstField();
+    Class<?>[] groups() default {};
 
-    String secondField();
+    Class<? extends Enum<?>> enumClass();
 }

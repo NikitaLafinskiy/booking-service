@@ -1,4 +1,4 @@
-package com.booking.bookingservice.validator;
+package com.booking.bookingservice.validator.fieldmatch;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
