@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1731771121998-10
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: role
+                  value: 'ADMIN'
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: role
+                  value: 'CUSTOMER'
