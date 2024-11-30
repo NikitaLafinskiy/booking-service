@@ -17,7 +17,7 @@ databaseChangeLog:
                   value: User
               - column:
                   name: password
-                  value: $2a$10$PoBv0vkg50PADNKQ3HA3TOsaTfwdmiJENW4BKRVjLxFEym7hBT00m
+                  value: $2y$10$lWYLby8NlpSidoHL1BtNO.FerqKRKxcOOzoaDprC7hoEkIzI8CGM6
 
         - insert:
             tableName: user_role

@@ -1,5 +1,6 @@
 package com.booking.bookingservice.exception.handler;
 
+import com.booking.bookingservice.exception.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex,
+                                                                WebRequest request) {
+        Map<String, Object> errors = composeCommonErrorAttributes(HttpStatusCode.valueOf(404), ex);
+        return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
