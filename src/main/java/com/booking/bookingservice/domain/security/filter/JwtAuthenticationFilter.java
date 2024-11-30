@@ -37,8 +37,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         AntPathMatcher matcher = new AntPathMatcher();
         String requestPath = request.getRequestURI();
 
-        return Arrays.stream(SecurityConfig.OPEN_REQUEST_MATCHES)
-                .anyMatch((pattern) -> matcher.match(PATH_PREFIX + pattern, requestPath));
+        return Arrays.stream(SecurityConfig.OPEN_ROUTES)
+                .anyMatch((routeMatch) -> {
+                    if (routeMatch.method() != null
+                            && !(routeMatch.method().name().equals(request.getMethod()))) {
+                        return false;
+                    }
+                    return matcher.match(PATH_PREFIX + routeMatch.path(), requestPath);
+                });
     }
 
     @Override

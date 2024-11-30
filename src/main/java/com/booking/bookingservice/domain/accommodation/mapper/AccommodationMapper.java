@@ -2,10 +2,11 @@ package com.booking.bookingservice.domain.accommodation.mapper;
 
 import com.booking.bookingservice.config.MapperConfig;
 import com.booking.bookingservice.domain.accommodation.dto.AccommodationDto;
-import com.booking.bookingservice.domain.accommodation.dto.CreateAccommodationRequestDto;
+import com.booking.bookingservice.domain.accommodation.dto.MutateAccommodationRequestDto;
 import com.booking.bookingservice.domain.accommodation.model.Accommodation;
 import com.booking.bookingservice.domain.accommodation.model.Amenity;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,13 +15,13 @@ import org.mapstruct.MappingTarget;
 @Mapper(config = MapperConfig.class)
 public interface AccommodationMapper {
     @Mapping(target = "amenities", ignore = true)
-    Accommodation toAccommodation(CreateAccommodationRequestDto createAccommodationRequestDto);
+    Accommodation toAccommodation(MutateAccommodationRequestDto mutateAccommodationRequestDto);
 
     @AfterMapping
     default void setAccommodationAmenities(
-            CreateAccommodationRequestDto createAccommodationRequestDto,
+            MutateAccommodationRequestDto mutateAccommodationRequestDto,
             @MappingTarget Accommodation accommodation) {
-        List<Amenity> amenities = createAccommodationRequestDto.getAmenities().stream()
+        List<Amenity> amenities = mutateAccommodationRequestDto.getAmenities().stream()
                 .map(amenity -> new Amenity(amenity, accommodation))
                 .toList();
         accommodation.setAmenities(amenities);
@@ -37,5 +38,20 @@ public interface AccommodationMapper {
                 .map(Amenity::getName)
                 .toList();
         accommodationDto.setAmenities(amenities);
+    }
+
+    @Mapping(target = "amenities", ignore = true)
+    void updateAccommodation(MutateAccommodationRequestDto mutateAccommodationRequestDto,
+                             @MappingTarget Accommodation accommodation);
+
+    @AfterMapping
+    default void setUpdatedAccommodationAmenities(
+            MutateAccommodationRequestDto mutateAccommodationRequestDto,
+            @MappingTarget Accommodation accommodation) {
+        accommodation.setAmenities(mutateAccommodationRequestDto
+                .getAmenities()
+                .stream()
+                .map(amenity -> new Amenity(amenity, accommodation))
+                .collect(Collectors.toList()));
     }
 }

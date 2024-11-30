@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,8 +35,9 @@ public class Accommodation {
     @Column(nullable = false)
     private String size;
 
-    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL)
-    private List<Amenity> amenities;
+    @OneToMany(mappedBy = "accommodation",
+            cascade = CascadeType.ALL)
+    private List<Amenity> amenities = new ArrayList<>();
 
     @Column(nullable = false)
     private BigDecimal dailyRate;

@@ -12,7 +12,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class CreateAccommodationRequestDto {
+public class MutateAccommodationRequestDto {
     @NotBlank
     @Size(min = 3, max = 255)
     private String location;
