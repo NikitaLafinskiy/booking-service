@@ -1,5 +1,6 @@
 package com.booking.bookingservice.domain.accommodation.model;
 
+import com.booking.bookingservice.domain.booking.model.Booking;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +39,10 @@ public class Accommodation {
     @OneToMany(mappedBy = "accommodation",
             cascade = CascadeType.ALL)
     private List<Amenity> amenities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "accommodation",
+            cascade = CascadeType.REMOVE)
+    private List<Booking> bookings = new ArrayList<>();
 
     @Column(nullable = false)
     private BigDecimal dailyRate;

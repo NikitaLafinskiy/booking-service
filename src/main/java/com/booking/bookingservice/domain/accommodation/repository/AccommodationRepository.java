@@ -18,4 +18,12 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
     @EntityGraph(attributePaths = "amenities")
     @Query("SELECT a FROM Accommodation  a WHERE a.id = :id")
     Optional<Accommodation> findByIdWithAmenities(Long id);
+
+    @EntityGraph(attributePaths = "bookings")
+    @Query("SELECT a FROM Accommodation a WHERE a.id = :id")
+    Optional<Accommodation> findByIdWithBookings(Long id);
+
+    @EntityGraph(attributePaths = {"amenities", "bookings"})
+    @Query("SELECT a FROM Accommodation a WHERE a.id = :id")
+    Optional<Accommodation> findByIdWithAmenitiesAndBookings(Long id);
 }

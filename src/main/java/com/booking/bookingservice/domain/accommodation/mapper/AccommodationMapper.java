@@ -41,6 +41,7 @@ public interface AccommodationMapper {
     }
 
     @Mapping(target = "amenities", ignore = true)
+    @Mapping(target = "bookings", ignore = true)
     void updateAccommodation(MutateAccommodationRequestDto mutateAccommodationRequestDto,
                              @MappingTarget Accommodation accommodation);
 

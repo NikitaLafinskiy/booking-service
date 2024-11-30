@@ -4,6 +4,8 @@ import com.booking.bookingservice.exception.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.booking.bookingservice.exception.InvalidInputException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -34,6 +36,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                 WebRequest request) {
         Map<String, Object> errors = composeCommonErrorAttributes(HttpStatusCode.valueOf(404), ex);
         return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<Object> handleInvalidInputException(InvalidInputException ex,
+                                                              WebRequest request) {
+        Map<String, Object> errors = composeCommonErrorAttributes(HttpStatusCode.valueOf(400), ex);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

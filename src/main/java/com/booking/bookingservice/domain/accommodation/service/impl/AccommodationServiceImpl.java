@@ -68,12 +68,11 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     @Transactional
     public void deleteAccommodation(Long id) {
-        Accommodation accommodation = accommodationRepository.findByIdWithAmenities(id)
+        Accommodation accommodation = accommodationRepository.findByIdWithAmenitiesAndBookings(id)
                 .orElseThrow(() ->
                 new EntityNotFoundException("Accommodation with an id of "
                         + id
                         + " not found"));
-        amenityRepository.deleteAmenitiesByAccommodation_Id(accommodation.getId());
         accommodationRepository.delete(accommodation);
     }
 }
