@@ -1,10 +1,9 @@
 package com.booking.bookingservice.exception.handler;
 
+import com.booking.bookingservice.exception.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.booking.bookingservice.exception.EntityNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
