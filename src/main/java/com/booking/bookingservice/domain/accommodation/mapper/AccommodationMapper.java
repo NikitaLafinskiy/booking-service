@@ -6,24 +6,27 @@ import com.booking.bookingservice.domain.accommodation.dto.MutateAccommodationRe
 import com.booking.bookingservice.domain.accommodation.model.Accommodation;
 import com.booking.bookingservice.domain.accommodation.model.Amenity;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 @Mapper(config = MapperConfig.class)
 public interface AccommodationMapper {
     @Mapping(target = "amenities", ignore = true)
-    Accommodation toAccommodation(MutateAccommodationRequestDto mutateAccommodationRequestDto);
+    Accommodation toEntity(MutateAccommodationRequestDto mutateAccommodationRequestDto);
 
     @AfterMapping
     default void setAccommodationAmenities(
             MutateAccommodationRequestDto mutateAccommodationRequestDto,
             @MappingTarget Accommodation accommodation) {
-        List<Amenity> amenities = mutateAccommodationRequestDto.getAmenities().stream()
+        Set<Amenity> amenities = mutateAccommodationRequestDto.getAmenities().stream()
                 .map(amenity -> new Amenity(amenity, accommodation))
-                .toList();
+                .collect(Collectors.toSet());
         accommodation.setAmenities(amenities);
     }
 
@@ -53,6 +56,13 @@ public interface AccommodationMapper {
                 .getAmenities()
                 .stream()
                 .map(amenity -> new Amenity(amenity, accommodation))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toSet()));
+    }
+
+    @Named("accommodationById")
+    default Accommodation accommodationById(Long id) {
+        return Optional.ofNullable(id)
+                .map(Accommodation::new)
+                .orElse(null);
     }
 }

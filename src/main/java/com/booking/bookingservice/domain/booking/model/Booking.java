@@ -13,10 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,7 +46,7 @@ public class Booking {
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status;
+    private BookingStatus status = BookingStatus.PENDING;
 
     public enum BookingStatus {
         PENDING,
