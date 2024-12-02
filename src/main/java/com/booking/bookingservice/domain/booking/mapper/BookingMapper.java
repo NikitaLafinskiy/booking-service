@@ -3,7 +3,8 @@ package com.booking.bookingservice.domain.booking.mapper;
 import com.booking.bookingservice.config.MapperConfig;
 import com.booking.bookingservice.domain.accommodation.mapper.AccommodationMapper;
 import com.booking.bookingservice.domain.booking.dto.BookingDto;
-import com.booking.bookingservice.domain.booking.dto.MutateBookingRequestDto;
+import com.booking.bookingservice.domain.booking.dto.CreateBookingRequestDto;
+import com.booking.bookingservice.domain.booking.dto.UpdateBookingRequestDto;
 import com.booking.bookingservice.domain.booking.model.Booking;
 import com.booking.bookingservice.domain.user.mapper.UserMapper;
 import org.mapstruct.Mapper;
@@ -18,7 +19,7 @@ public interface BookingMapper {
     @Mapping(target = "user",
             source = "userId",
             qualifiedByName = "userById")
-    Booking toEntity(MutateBookingRequestDto mutateBookingRequestDto);
+    Booking toEntity(CreateBookingRequestDto createBookingRequestDto);
 
     @Mapping(target = "accommodationId",
             source = "accommodation.id")
@@ -27,5 +28,5 @@ public interface BookingMapper {
     BookingDto toDto(Booking booking);
 
     void updateBooking(@MappingTarget Booking booking,
-                       MutateBookingRequestDto mutateBookingRequestDto);
+                       UpdateBookingRequestDto updateBookingRequestDto);
 }
