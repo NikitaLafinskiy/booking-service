@@ -25,7 +25,7 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Transactional
     public AccommodationDto createAccommodation(
             MutateAccommodationRequestDto mutateAccommodationRequestDto) {
-        Accommodation accommodation = accommodationMapper.toAccommodation(
+        Accommodation accommodation = accommodationMapper.toEntity(
                 mutateAccommodationRequestDto);
         accommodationRepository.save(accommodation);
         return accommodationMapper.toDto(accommodation);
@@ -68,12 +68,11 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     @Transactional
     public void deleteAccommodation(Long id) {
-        Accommodation accommodation = accommodationRepository.findByIdWithAmenities(id)
+        Accommodation accommodation = accommodationRepository.findById(id)
                 .orElseThrow(() ->
                 new EntityNotFoundException("Accommodation with an id of "
                         + id
                         + " not found"));
-        amenityRepository.deleteAmenitiesByAccommodation_Id(accommodation.getId());
         accommodationRepository.delete(accommodation);
     }
 }

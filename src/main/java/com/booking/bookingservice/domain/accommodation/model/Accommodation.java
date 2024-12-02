@@ -1,5 +1,6 @@
 package com.booking.bookingservice.domain.accommodation.model;
 
+import com.booking.bookingservice.domain.booking.model.Booking;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,15 +12,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "accommodation")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Accommodation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +40,11 @@ public class Accommodation {
 
     @OneToMany(mappedBy = "accommodation",
             cascade = CascadeType.ALL)
-    private List<Amenity> amenities = new ArrayList<>();
+    private Set<Amenity> amenities = new HashSet<>();
+
+    @OneToMany(mappedBy = "accommodation",
+            cascade = CascadeType.REMOVE)
+    private Set<Booking> bookings = new HashSet<>();
 
     @Column(nullable = false)
     private BigDecimal dailyRate;
@@ -50,5 +57,9 @@ public class Accommodation {
         APARTMENT,
         CONDO,
         VACATION_HOME
+    }
+
+    public Accommodation(Long id) {
+        this.id = id;
     }
 }

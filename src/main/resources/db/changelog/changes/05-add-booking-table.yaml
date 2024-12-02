@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1732976292498-1
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_booking
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: check_in_date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: check_out_date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: accommodation_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: VARCHAR(255)
+            tableName: booking
+  - changeSet:
+      id: 1732976292498-2
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: accommodation_id
+            baseTableName: booking
+            constraintName: FK_BOOKING_ON_ACCOMMODATION
+            referencedColumnNames: id
+            referencedTableName: accommodation
+  - changeSet:
+      id: 1732976292498-3
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: booking
+            constraintName: FK_BOOKING_ON_USER
+            referencedColumnNames: id
+            referencedTableName: user
+
