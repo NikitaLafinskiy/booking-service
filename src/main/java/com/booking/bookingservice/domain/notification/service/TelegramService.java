@@ -4,4 +4,9 @@ public interface TelegramService {
     void sendMessage(String message, Long chatId);
 
     void getUpdates();
+
+    enum ChatState {
+        INIT,
+        REGISTRATION,
+    }
 }

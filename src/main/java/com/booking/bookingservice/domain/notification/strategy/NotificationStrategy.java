@@ -2,11 +2,11 @@ package com.booking.bookingservice.domain.notification.strategy;
 
 import com.booking.bookingservice.domain.notification.command.NotificationCommand;
 import com.booking.bookingservice.domain.notification.handler.NotificationInputHandler;
-import com.booking.bookingservice.domain.notification.service.impl.TelegramServiceImpl;
+import com.booking.bookingservice.domain.notification.service.TelegramService;
 import com.booking.bookingservice.exception.InvalidInputException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,7 +16,7 @@ public class NotificationStrategy {
 
     private final List<NotificationCommand> commandHandlers;
     private final List<NotificationInputHandler> notificationInputHandlers;
-    private final RedisTemplate<Long, TelegramServiceImpl.ChatState> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     public String handleText(Long chatId, String text) {
         if (text.startsWith(COMMAND_PREFIX)) {
@@ -28,7 +28,9 @@ public class NotificationStrategy {
                     .orElseThrow(() -> new InvalidInputException("Unknown text"));
             return commandHandler.execute(chatId);
         } else {
-            TelegramServiceImpl.ChatState chatState = redisTemplate.opsForValue().get(chatId);
+            TelegramService.ChatState chatState = TelegramService.ChatState
+                    .valueOf(stringRedisTemplate.opsForValue()
+                            .get(String.valueOf(chatId)));
             NotificationInputHandler notificationInputHandler = notificationInputHandlers.stream()
                     .filter(handler -> handler
                             .getKey()

@@ -8,19 +8,14 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TelegramServiceImpl implements TelegramService {
     private final TelegramBot telegramBot;
     private final NotificationStrategy notificationStrategy;
-
-    public TelegramServiceImpl(@Value("${telegram.bot-token}") String token,
-                               NotificationStrategy notificationStrategy) {
-        this.telegramBot = new TelegramBot(token);
-        this.notificationStrategy = notificationStrategy;
-    }
 
     @PostConstruct
     public void init() {
@@ -55,10 +50,5 @@ public class TelegramServiceImpl implements TelegramService {
         Long chatId = message.chat().id();
         String text = message.text();
         return notificationStrategy.handleText(chatId, text);
-    }
-
-    public enum ChatState {
-        INIT,
-        REGISTRATION
     }
 }

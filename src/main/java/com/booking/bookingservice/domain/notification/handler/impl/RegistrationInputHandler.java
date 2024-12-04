@@ -1,10 +1,10 @@
 package com.booking.bookingservice.domain.notification.handler.impl;
 
 import com.booking.bookingservice.domain.notification.handler.NotificationInputHandler;
-import com.booking.bookingservice.domain.notification.service.impl.TelegramServiceImpl;
+import com.booking.bookingservice.domain.notification.service.TelegramService;
 import com.booking.bookingservice.domain.user.model.User;
 import com.booking.bookingservice.domain.user.repository.UserRepository;
-import com.booking.bookingservice.exception.EntityNotFoundException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +15,13 @@ public class RegistrationInputHandler implements NotificationInputHandler {
 
     @Override
     public String handle(String userInput, Long chatId) {
-        User user = userRepository.findByEmail(userInput)
-                .orElseThrow(() -> new EntityNotFoundException(
-                "User with an email of "
-                        + userInput
-                        + " not found"));
+        Optional<User> optionalUser = userRepository.findByEmail(userInput);
+
+        if (optionalUser.isEmpty()) {
+            return "An account with this email does not exist. Please provide a different email";
+        }
+
+        User user = optionalUser.get();
         user.setTelegramChatId(chatId);
         userRepository.save(user);
 
@@ -29,7 +31,7 @@ public class RegistrationInputHandler implements NotificationInputHandler {
     }
 
     @Override
-    public TelegramServiceImpl.ChatState getKey() {
-        return TelegramServiceImpl.ChatState.REGISTRATION;
+    public TelegramService.ChatState getKey() {
+        return TelegramService.ChatState.REGISTRATION;
     }
 }
