@@ -62,7 +62,7 @@ public class BookingController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBooking(@PathVariable Long id) {
-        bookingService.deleteBooking(id);
+    public void cancelBooking(@PathVariable Long id) {
+        bookingService.cancelBooking(id);
     }
 }
