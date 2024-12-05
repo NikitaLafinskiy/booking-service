@@ -2,6 +2,8 @@ package com.booking.bookingservice.exception.handler;
 
 import com.booking.bookingservice.exception.EntityNotFoundException;
 import com.booking.bookingservice.exception.InvalidInputException;
+import com.booking.bookingservice.exception.PaymentException;
+import com.booking.bookingservice.exception.UnauthorizedException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +44,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                               WebRequest request) {
         Map<String, Object> errors = composeCommonErrorAttributes(HttpStatusCode.valueOf(400), ex);
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Object> handleUnauthorizedException(UnauthorizedException ex,
+                                                              WebRequest request) {
+        Map<String, Object> errors = composeCommonErrorAttributes(HttpStatusCode.valueOf(401), ex);
+        return new ResponseEntity<>(errors, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<Object> handlePaymentException(PaymentException ex, WebRequest request) {
+        Map<String, Object> errors = composeCommonErrorAttributes(HttpStatusCode.valueOf(500), ex);
+        return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)

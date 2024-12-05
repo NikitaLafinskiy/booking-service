@@ -31,6 +31,8 @@ public class SecurityConfig {
     public static final RouteMatch[] OPEN_ROUTES = new RouteMatch[]{
             new RouteMatch("/auth/**", null),
             new RouteMatch("/accommodations/**", HttpMethod.GET),
+            new RouteMatch("/payments/success", HttpMethod.GET),
+            new RouteMatch("/payments/cancel", HttpMethod.GET)
     };
 
     private final UserDetailsService userDetailsService;

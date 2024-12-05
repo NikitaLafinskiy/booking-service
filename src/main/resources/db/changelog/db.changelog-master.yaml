@@ -11,3 +11,5 @@ databaseChangeLog:
       file: classpath:db/changelog/changes/05-add-booking-table.yaml
   - include:
       file: classpath:db/changelog/changes/06-add-user-telegram-channel-id-field.yaml
+  - include:
+      file: classpath:db/changelog/changes/07-add-payment-table.yaml

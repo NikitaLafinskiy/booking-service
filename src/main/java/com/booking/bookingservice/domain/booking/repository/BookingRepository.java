@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByUser_Id(Long userId);
 
-    List<Booking> findBookingsByStatus(Booking.BookingStatus bookingStatus);
-
     @EntityGraph(attributePaths = {"accommodation", "user"})
     @Query("SELECT b FROM Booking b WHERE b.id = :bookingId")
     Optional<Booking> findByIdWithDetails(Long bookingId);

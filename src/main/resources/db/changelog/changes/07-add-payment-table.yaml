@@ -1,0 +1,138 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1733410815019-1
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_payment
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: booking_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: payment_status
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: amount_to_pay
+                  type: DECIMAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: payment
+  - changeSet:
+      id: 1733410815019-2
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_session
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: session_id
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: session_url
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: payment_id
+                  type: BIGINT
+            tableName: session
+  - changeSet:
+      id: 1733410815019-3
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: booking_id
+            constraintName: uc_payment_booking
+            tableName: payment
+  - changeSet:
+      id: 1733410815019-4
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: payment_id
+            constraintName: uc_session_payment
+            tableName: session
+  - changeSet:
+      id: 1733410815019-5
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: session_id
+            constraintName: uc_session_sessionid
+            tableName: session
+  - changeSet:
+      id: 1733410815019-6
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: session_url
+            constraintName: uc_session_sessionurl
+            tableName: session
+  - changeSet:
+      id: 1733410815019-7
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: booking_id
+            baseTableName: payment
+            constraintName: FK_PAYMENT_ON_BOOKING
+            referencedColumnNames: id
+            referencedTableName: booking
+  - changeSet:
+      id: 1733410815019-8
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: payment
+            constraintName: FK_PAYMENT_ON_USER
+            referencedColumnNames: id
+            referencedTableName: user
+  - changeSet:
+      id: 1733410815019-9
+      author: nikita
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: payment_id
+            baseTableName: session
+            constraintName: FK_SESSION_ON_PAYMENT
+            referencedColumnNames: id
+            referencedTableName: payment
+
