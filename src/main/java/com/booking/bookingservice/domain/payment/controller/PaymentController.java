@@ -4,6 +4,8 @@ import com.booking.bookingservice.domain.payment.dto.CreatePaymentRequestDto;
 import com.booking.bookingservice.domain.payment.dto.PaymentDto;
 import com.booking.bookingservice.domain.payment.service.PaymentService;
 import com.booking.bookingservice.domain.user.dto.UserDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,14 @@ public class PaymentController {
     @Value("${app.client-domain}")
     private String clientDomain;
 
+    @Operation(summary = "Get payment details",
+            description = "Get payment details by user id",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Payment details retrieved successfully"),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized"),
+            })
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     public PaymentDto getPayment(@RequestParam Long userId,
@@ -40,6 +50,16 @@ public class PaymentController {
         return paymentService.getPayment(userId, authentication);
     }
 
+    @Operation(summary = "Create a payment",
+            description = "Create a payment with payment details",
+            responses = {
+                    @ApiResponse(responseCode = "303",
+                            description = "Payment initiated, redirecting to a payment gateway"),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid request body"),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized"),
+            })
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<String> createPayment(
@@ -57,6 +77,14 @@ public class PaymentController {
                 .body(paymentDto);
     }
 
+    @Operation(summary = "Payment success",
+            description = "Handle payment success",
+            responses = {
+                    @ApiResponse(responseCode = "303",
+                            description = "Redirect to a success page"),
+                    @ApiResponse(responseCode = "500",
+                            description = "Something went wrong while processing a payment"),
+            })
     @GetMapping("/success")
     public ResponseEntity<String> paymentSuccess(@RequestParam String sessionId) {
         String paymentDto = paymentService.paymentSuccess(sessionId);
@@ -65,6 +93,14 @@ public class PaymentController {
                 .body(paymentDto);
     }
 
+    @Operation(summary = "Payment cancel",
+            description = "Handle payment cancel",
+            responses = {
+                    @ApiResponse(responseCode = "303",
+                            description = "Redirect to a cancel page"),
+                    @ApiResponse(responseCode = "500",
+                            description = "Something went wrong while canceling a payment"),
+            })
     @GetMapping("/cancel")
     public ResponseEntity<String> paymentCancel(@RequestParam String sessionId) {
         String paymentDto = paymentService.paymentCancel(sessionId);
