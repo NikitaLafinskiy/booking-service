@@ -2,7 +2,6 @@ package com.booking.bookingservice.domain.auth.mapper;
 
 import com.booking.bookingservice.config.MapperConfig;
 import com.booking.bookingservice.domain.auth.dto.RegisterUserRequestDto;
-import com.booking.bookingservice.domain.user.dto.UserDto;
 import com.booking.bookingservice.domain.user.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,6 +10,4 @@ import org.mapstruct.Mapping;
 public interface AuthMapper {
     @Mapping(target = "id", ignore = true)
     User toUserFromRegisterUserRequestDto(RegisterUserRequestDto registerUserRequestDto);
-
-    UserDto toUserDtoFromUser(User user);
 }

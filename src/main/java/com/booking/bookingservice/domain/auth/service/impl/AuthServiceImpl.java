@@ -7,6 +7,7 @@ import com.booking.bookingservice.domain.auth.mapper.AuthMapper;
 import com.booking.bookingservice.domain.auth.service.AuthService;
 import com.booking.bookingservice.domain.token.service.TokenService;
 import com.booking.bookingservice.domain.user.dto.UserDto;
+import com.booking.bookingservice.domain.user.mapper.UserMapper;
 import com.booking.bookingservice.domain.user.model.Role;
 import com.booking.bookingservice.domain.user.model.User;
 import com.booking.bookingservice.domain.user.repository.RoleRepository;
@@ -31,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public LoginResponseDto login(LoginUserRequestDto loginUserRequestDto) {
@@ -39,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
                 loginUserRequestDto.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         Authentication authenticationWithAuthorities = new UsernamePasswordAuthenticationToken(
-                authMapper.toUserDtoFromUser((User) authentication.getPrincipal()),
+                userMapper.toDto((User) authentication.getPrincipal()),
                 null,
                 ((User) authentication.getPrincipal()).getAuthorities());
         String accessToken = tokenService.generateToken(authenticationWithAuthorities,
@@ -62,6 +64,6 @@ public class AuthServiceImpl implements AuthService {
         user.setRoles(Set.of(roleRepository.findByRoleType(DEFAULT_USER_ROLE)));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return authMapper.toUserDtoFromUser(user);
+        return userMapper.toDto(user);
     }
 }

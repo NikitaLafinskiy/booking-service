@@ -1,11 +1,17 @@
 package com.booking.bookingservice.domain.user.controller;
 
+import com.booking.bookingservice.domain.user.dto.UpdateUserRequestDto;
+import com.booking.bookingservice.domain.user.dto.UpdateUserRolesRequestDto;
 import com.booking.bookingservice.domain.user.dto.UserDto;
 import com.booking.bookingservice.domain.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,5 +25,20 @@ public class UserController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     public UserDto me(@AuthenticationPrincipal UserDto userDto) {
         return userService.me(userDto);
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
+    public UserDto updateMe(@AuthenticationPrincipal UserDto userDto,
+                            @RequestBody @Valid UpdateUserRequestDto updateUserRequestDto) {
+        return userService.updateMe(userDto, updateUserRequestDto);
+    }
+
+    @PutMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserDto updateRole(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateUserRolesRequestDto updateUserRolesRequestDto) {
+        return userService.updateUserRoles(id, updateUserRolesRequestDto);
     }
 }
