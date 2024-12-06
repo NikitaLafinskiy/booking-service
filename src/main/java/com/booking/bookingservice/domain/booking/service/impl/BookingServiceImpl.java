@@ -197,7 +197,9 @@ public class BookingServiceImpl implements BookingService {
             && checkInDate.isAfter(booking.getCheckInDate()))
                 || (checkOutDate
                 .isAfter(booking.getCheckInDate())
-            && checkOutDate.isBefore(booking.getCheckOutDate()));
+            && checkOutDate.isBefore(booking.getCheckOutDate()))
+                || (checkInDate.isEqual(booking.getCheckInDate())
+                && checkOutDate.isEqual(booking.getCheckOutDate()));
     }
 
     private void sendBookingNotification(Booking booking,
