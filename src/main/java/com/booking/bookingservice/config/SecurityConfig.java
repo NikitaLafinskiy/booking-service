@@ -32,7 +32,9 @@ public class SecurityConfig {
             new RouteMatch("/auth/**", null),
             new RouteMatch("/accommodations/**", HttpMethod.GET),
             new RouteMatch("/payments/success", HttpMethod.GET),
-            new RouteMatch("/payments/cancel", HttpMethod.GET)
+            new RouteMatch("/payments/cancel", HttpMethod.GET),
+            new RouteMatch("/swagger-ui/**", null),
+            new RouteMatch("/v3/api-docs/**", null),
     };
 
     private final UserDetailsService userDetailsService;
