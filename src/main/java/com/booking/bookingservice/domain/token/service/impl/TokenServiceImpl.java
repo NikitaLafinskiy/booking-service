@@ -84,6 +84,11 @@ public class TokenServiceImpl implements TokenService {
 
     public boolean validateToken(String token,
                                  TokenType tokenType) {
+        if (tokenType.equals(TokenType.REFRESH)
+                && refreshTokenRepository.findByToken(token).isEmpty()) {
+            return false;
+        }
+
         Jws<Claims> claimsJws = Jwts.parser()
                 .verifyWith(tokenType == TokenType.ACCESS ? accessSecretKey : refreshSecretKey)
                 .build()
