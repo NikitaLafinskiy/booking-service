@@ -15,8 +15,12 @@ public class EnumListMatchValidator implements ConstraintValidator<EnumListMatch
 
     @Override
     public boolean isValid(List<String> values, ConstraintValidatorContext context) {
-        return values.stream()
-                .allMatch(value -> Arrays.stream(enumClass.getEnumConstants())
-                        .anyMatch(e -> e.name().equals(value)));
+        try {
+            return values.stream()
+                    .allMatch(value -> Arrays.stream(enumClass.getEnumConstants())
+                            .anyMatch(e -> e.name().equals(value)));
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

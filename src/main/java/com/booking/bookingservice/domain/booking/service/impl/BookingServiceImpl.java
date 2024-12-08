@@ -135,6 +135,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public void cancelBooking(Long id) {
         Booking booking = bookingRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException("Booking with an id of "
