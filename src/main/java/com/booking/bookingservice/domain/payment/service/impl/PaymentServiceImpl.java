@@ -88,6 +88,13 @@ public class PaymentServiceImpl implements PaymentService {
                     .orElseThrow(() -> new EntityNotFoundException("Booking with an id of "
                             + createPaymentRequestDto.getBookingId()
                             + " not found"));
+
+            if (!booking.getUser()
+                    .getId()
+                    .equals(userDto.getId())) {
+                throw new UnauthorizedException("You are not allowed to access this booking");
+            }
+
             BigDecimal dailyRate = booking.getAccommodation().getDailyRate();
             long rentalDays = booking.getCheckInDate()
                     .until(booking.getCheckOutDate(), ChronoUnit.DAYS);

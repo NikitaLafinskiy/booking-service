@@ -45,8 +45,6 @@ public class AccommodationController {
     @Operation(summary = "Get all accommodations", responses = {
             @ApiResponse(responseCode = "200",
                     description = "Accommodations retrieved successfully"),
-            @ApiResponse(responseCode = "401",
-                    description = "Unauthorized"),
     })
     @GetMapping
     public List<AccommodationDto> getAccommodations(Pageable pageable) {

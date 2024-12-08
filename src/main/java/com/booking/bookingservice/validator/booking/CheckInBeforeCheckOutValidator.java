@@ -17,14 +17,18 @@ public class CheckInBeforeCheckOutValidator
 
     @Override
     public boolean isValid(Object value, jakarta.validation.ConstraintValidatorContext context) {
-        LocalDate checkInDate = (LocalDate) new BeanWrapperImpl(value)
-                .getPropertyValue(checkInDateField);
-        LocalDate checkOutDate = (LocalDate) new BeanWrapperImpl(value)
-                .getPropertyValue(checkOutDateField);
-        if (checkInDate == null || checkOutDate == null) {
+        try {
+            LocalDate checkInDate = (LocalDate) new BeanWrapperImpl(value)
+                    .getPropertyValue(checkInDateField);
+            LocalDate checkOutDate = (LocalDate) new BeanWrapperImpl(value)
+                    .getPropertyValue(checkOutDateField);
+            if (checkInDate == null || checkOutDate == null) {
+                return false;
+            } else {
+                return checkInDate.isBefore(checkOutDate);
+            }
+        } catch (Exception e) {
             return false;
-        } else {
-            return checkInDate.isBefore(checkOutDate);
         }
     }
 }

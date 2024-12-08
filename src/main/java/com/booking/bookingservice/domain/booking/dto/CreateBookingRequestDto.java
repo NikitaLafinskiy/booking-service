@@ -5,9 +5,11 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
+@Accessors(chain = true)
 @CheckInBeforeCheckOut(checkInDateField = "checkInDate", checkOutDateField = "checkOutDate")
 public class CreateBookingRequestDto {
     @NotNull

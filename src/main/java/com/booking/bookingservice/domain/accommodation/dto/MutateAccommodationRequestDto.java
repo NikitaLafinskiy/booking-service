@@ -10,8 +10,10 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain = true)
 public class MutateAccommodationRequestDto {
     @NotBlank
     @Size(min = 3, max = 255)

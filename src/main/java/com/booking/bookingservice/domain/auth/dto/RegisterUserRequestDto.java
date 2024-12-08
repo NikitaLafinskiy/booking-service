@@ -5,12 +5,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @FieldMatch(
         firstField = "password",
         secondField = "confirmPassword",
         message = "The password fields must match")
+@Accessors(chain = true)
 public class RegisterUserRequestDto {
     @Email
     @NotBlank
