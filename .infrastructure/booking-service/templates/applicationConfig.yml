@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-application-config
+  namespace: {{ .Values.common.namespace }}
+data:
+    application.yml: |-
+        spring:
+          liquibase:
+            enabled: false
+          jpa:
+            hibernate:
+            ddl-auto: validate
+            show-sql: true
+            open-in-view: false
+          datasource:
+            driver-class-name: org.postgresql.Driver
+            url: jdbc:postgresql://{{ .Values.bookingService.db.connectionUrl }}:{{ .Values.bookingService.db.connectionPort }}/{{ .Values.applicationConfig.datasource.database }}
+            username: ${DB_USERNAME} # (referencing them from the env variables and the variables are set using a secretKeyRef defined in values.yml)
+            password: ${DB_PASSWORD}
+          application:
+            name: booking-service
+          threads:
+            virtual:
+              enabled: true
+          data:
+            redis:
+              host: {{ .Values.applicationConfig.data.redis.host }}
+              port: {{ .Values.applicationConfig.data.redis.port }}
+
+        server:
+          port: {{ .Values.applicationConfig.server.port }}
+          servlet:
+            context-path: /api
+
+        app:
+          server-domain: {{ .Values.applicationConfig.app.serverDomain }}
+          client-domain: {{ .Values.applicationConfig.app.clientDomain }}
+
+        jwt:
+          access-secret: ${JWT_ACCESS_SECRET}
+          refresh-secret: ${JWT_REFRESH_SECRET}
+          refresh-expiration: 2678400000
+          access-expiration: 900000
+
+        telegram:
+          bot-token: ${TELEGRAM_BOT_TOKEN}
+
+        stripe:
+            secret-key: ${STRING_SECRET_KEY}
+            default-currency: usd

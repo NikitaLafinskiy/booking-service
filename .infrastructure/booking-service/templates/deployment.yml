@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-deployment
+  namespace: {{ .Values.common.namespace }}
+spec:
+  replicas: {{ .Values.bookingService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.bookingService.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.bookingService.rollingUpdate.maxUnavailable }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-pod
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-pod
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.bookingService.image.repository }}:{{ .Values.bookingService.image.tag }}
+          ports:
+              - containerPort: 8080
+          startupProbe:
+            httpGet:
+              port: 8080
+              path: /startup/health
+            failureThreshold: 5
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /liveness/health
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /readiness/health
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 3
+          volumeMounts:
+            - mountPath: {{ .Values.bookingService.applicationYmlMountPath }}
+              name: application-config
+              subPath: application.yml
+          env:
+            {{- range $k, $v := .Values.applicationSecret }}
+            - name: {{ $k }}
+              valueFrom:
+                secretKeyRef:
+                  key: {{ $k }}
+                  name: {{ $.Chart.Name }}-application-secret
+            {{- end }}
+      {{- if eq .Values.common.environment "local" }}
+      imagePullSecrets:
+        - name: ecr-secret
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - {{ .Chart.Name }}-pod
+      volumes:
+        - name: application-config
+          configMap:
+            name: {{ .Chart.Name }}-application-config

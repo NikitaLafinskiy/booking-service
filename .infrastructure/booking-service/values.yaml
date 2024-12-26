@@ -1,0 +1,48 @@
+common:
+  namespace: booking-service
+  environment: local
+
+applicationSecret:
+  DB_USERNAME: postgres
+  DB_PASSWORD: password
+  JWT_ACCESS_SECRET: ed38a01ceb430a4225f42b65ddf6d962748f8df5ad845ddd87d45f08b4d46fc5
+  JWT_REFRESH_SECRET: 696b70b80b127a8cdfce4058dbe95217bfe08a19a951b3616743ef802fca8454
+  TELEGRAM_BOT_TOKEN: 7845649954:AAFwBFMEghkJi7iDXLrpFTkcTtu_5_Fmvjs
+  STRING_SECRET_KEY: sk_test_51HtaHsGpWVsd6jizvdVpBrKLwnIBDTNVnej78jilqgJjm6AcgnxN7AGTo9DntzZlb0uiWO8DR27odlDIubaA9xa600mnI5BVwP
+
+ecr:
+  password: placeholder
+
+applicationConfig:
+  datasource:
+    database: booking
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  server:
+    port: 8080
+  app:
+    serverDomain: http://localhost:8080/api
+    clientDomain: http://localhost:3000
+
+bookingService:
+  image:
+    repository: 578748851450.dkr.ecr.eu-central-1.amazonaws.com/booking-service
+    tag: 1.0.0
+  replicaCount: 2
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+  applicationYmlMountPath: /usr/app/src/main/resources/application.yml
+  hpa:
+    minReplicas: 1
+    maxReplicas: 10
+    memory:
+      averageUtilization: 50
+    cpu:
+      averageUtilization: 50
+  db:
+    connectionUrl: podname.servicename.namespace.svc.cluster.local
+    connectionPort: 5432
+
