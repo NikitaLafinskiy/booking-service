@@ -26,15 +26,15 @@ spec:
           startupProbe:
             httpGet:
               port: 8080
-              path: /startup/health
+              path: /api/health/startup
             failureThreshold: 5
-            initialDelaySeconds: 120
+            initialDelaySeconds: 40
             periodSeconds: 20
             successThreshold: 1
           livenessProbe:
             httpGet:
               port: 8080
-              path: /liveness/health
+              path: /api/actuator/health/liveness
             failureThreshold: 3
             initialDelaySeconds: 30
             periodSeconds: 10
@@ -42,16 +42,19 @@ spec:
           readinessProbe:
             httpGet:
               port: 8080
-              path: /readiness/health
+              path: /api/actuator/health/readiness
             failureThreshold: 3
             initialDelaySeconds: 30
             periodSeconds: 5
             successThreshold: 3
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: {{ .Values.bookingService.applicationYmlMountPath }}
               name: application-config
               subPath: application.yml
           env:
+            - name: SPRING_CONFIG_LOCATION
+              value: {{ .Values.bookingService.applicationYmlMountPath }}
             {{- range $k, $v := .Values.applicationSecret }}
             - name: {{ $k }}
               valueFrom:
@@ -59,7 +62,7 @@ spec:
                   key: {{ $k }}
                   name: {{ $.Chart.Name }}-application-secret
             {{- end }}
-      {{- if eq .Values.common.environment "local" }}
+      {{- if eq .Values.global.environment "local" }}
       imagePullSecrets:
         - name: ecr-secret
       {{- end }}

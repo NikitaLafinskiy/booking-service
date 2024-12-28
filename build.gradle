@@ -1,9 +1,19 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.liquibase:liquibase-core:4.19.0'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.5'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'org.hibernate.orm' version '6.5.3.Final'
     id 'checkstyle'
+    id("org.liquibase.gradle") version "3.0.1"
 }
 
 group = 'com'
@@ -26,6 +36,8 @@ repositories {
 }
 
 dependencies {
+    liquibaseRuntime 'org.liquibase:liquibase-core'
+    liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -36,7 +48,6 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-    implementation 'org.liquibase:liquibase-core'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
@@ -48,6 +59,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.stripe:stripe-java:28.1.0'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
