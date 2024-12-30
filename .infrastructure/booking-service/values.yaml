@@ -2,6 +2,8 @@ common:
   namespace: booking-service
 
 global:
+  ecr:
+    password: placeholder
   environment: local
 
 psql:
@@ -18,9 +20,6 @@ applicationSecret:
   JWT_REFRESH_SECRET: 696b70b80b127a8cdfce4058dbe95217bfe08a19a951b3616743ef802fca8454
   TELEGRAM_BOT_TOKEN: 7845649954:AAFwBFMEghkJi7iDXLrpFTkcTtu_5_Fmvjs
   STRING_SECRET_KEY: sk_test_51HtaHsGpWVsd6jizvdVpBrKLwnIBDTNVnej78jilqgJjm6AcgnxN7AGTo9DntzZlb0uiWO8DR27odlDIubaA9xa600mnI5BVwP
-
-ecr:
-  password: placeholder
 
 applicationConfig:
   datasource:

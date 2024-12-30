@@ -46,8 +46,6 @@ spec:
                   - pg_isready -U {{ .Values.db.POSTGRES_USER }} -d {{ .Values.db.POSTGRES_DB }} -h localhost
             initialDelaySeconds: 30
             periodSeconds: 10
-      imagePullSecrets:
-        - name: ecr-secret
   volumeClaimTemplates:
     - kind: PersistentVolumeClaim
       apiVersion: v1

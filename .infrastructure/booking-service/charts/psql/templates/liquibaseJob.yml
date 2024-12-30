@@ -20,8 +20,11 @@ spec:
           command: [ "liquibase",
                      "update",
                      "--driver=org.postgresql.Driver",
-                     "--changeLogFile=/liquibase/changelog/db.changelog-master.yaml",
+                     "--changeLogFile=changelog/db.changelog-master.yaml",
                      "--url={{ .Values.db.LIQUIBASE_URL }}",
                      "--username={{ .Values.db.POSTGRES_USER }}",
                      "--password={{ .Values.db.POSTGRES_PASSWORD }}" ]
+          imagePullPolicy: Always
       restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: ecr-secret

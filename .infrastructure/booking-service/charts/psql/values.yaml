@@ -1,14 +1,11 @@
 common:
   namespace: psql
 
-ecr:
-  password: placeholder
-
 statefulSet:
   liquibase:
     image:
       repository: 578748851450.dkr.ecr.eu-central-1.amazonaws.com/booking-liquibase
-      tag: 1.0.0
+      tag: 1.1.0
   pvc:
     storage: 1Gi
   volumeMounts:

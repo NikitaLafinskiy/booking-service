@@ -1,5 +1,6 @@
 FROM liquibase:4.30.0-alpine
 
-COPY ./src/main/resources/db/changelog/ /liquibase/changelog/
+WORKDIR /liquibase/
 
-ENTRYPOINT ["liquibase", "update", "--driver=org.postgresql.Driver", "--changeLogFile=/liquibase/changelog/db.changelog-master.yaml"]
+COPY ./src/main/resources/db/changelog/ /liquibase/changelog/
+COPY ./src/main/resources/db/changelog/changes /liquibase/lib/changes/
