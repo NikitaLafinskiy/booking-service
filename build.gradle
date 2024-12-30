@@ -38,6 +38,7 @@ repositories {
 dependencies {
     liquibaseRuntime 'org.liquibase:liquibase-core'
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
+    testImplementation 'org.liquibase:liquibase-core'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
