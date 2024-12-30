@@ -12,6 +12,10 @@ public class AmenityNameValidator implements ConstraintValidator<ValidAmenityNam
     }
 
     private boolean isValidAmenity(String amenity) {
-        return amenity.length() > 1 && amenity.length() < 255;
+        try {
+            return amenity.length() > 1 && amenity.length() < 255;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

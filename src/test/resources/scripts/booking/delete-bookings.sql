@@ -1,0 +1,2 @@
+DELETE FROM booking;
+ALTER SEQUENCE booking_id_seq RESTART WITH 1;
