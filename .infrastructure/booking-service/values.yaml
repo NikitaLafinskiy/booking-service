@@ -54,3 +54,6 @@ bookingService:
     connectionUrl: psql-stateful-set-0.psql-headless-cluster-ip.psql.svc.cluster.local
     connectionPort: 5432
 
+rbac:
+  viewerGroup: booking-service-viewer
+  adminGroup: booking-service-admin

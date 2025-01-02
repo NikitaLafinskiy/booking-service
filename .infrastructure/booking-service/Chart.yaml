@@ -9,3 +9,5 @@ dependencies:
     version: 0.1.0
   - name: redis
     version: 0.1.0
+  - name: kube-prometheus-stack
+    version: 67.3.0
