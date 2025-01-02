@@ -14,5 +14,6 @@ module "eks" {
   private_subnet_ids         = module.network.private_subnet_ids
   k8s_rbac_viewer_group_name = "booking-service-viewer"
   k8s_rbac_admin_group_name  = "booking-service-admin"
+  region                     = local.region
   depends_on                 = [module.network]
 }
