@@ -1,0 +1,11 @@
+common:
+  namespace: redis
+
+statefulSet:
+  image:
+    repository: redis
+    tag: 7.4.1
+  pvc:
+    storage: 1Gi
+  volumeMounts:
+    mountPath: /data

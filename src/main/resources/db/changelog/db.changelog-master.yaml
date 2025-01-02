@@ -1,15 +1,15 @@
 databaseChangeLog:
   - include:
-      file: classpath:db/changelog/changes/01-security-init-changelog.yaml
+      file: ./changes/01-security-init-changelog.yaml
   - include:
-      file: classpath:db/changelog/changes/02-add-user-roles.yaml
+      file: ./changes/02-add-user-roles.yaml
   - include:
-      file: classpath:db/changelog/changes/03-add-admin-user-changelog.yaml
+      file: ./changes/03-add-admin-user-changelog.yaml
   - include:
-      file: classpath:db/changelog/changes/04-add-accommodation-table.yaml
+      file: ./changes/04-add-accommodation-table.yaml
   - include:
-      file: classpath:db/changelog/changes/05-add-booking-table.yaml
+      file: ./changes/05-add-booking-table.yaml
   - include:
-      file: classpath:db/changelog/changes/06-add-user-telegram-channel-id-field.yaml
+      file: ./changes/06-add-user-telegram-channel-id-field.yaml
   - include:
-      file: classpath:db/changelog/changes/07-add-payment-table.yaml
+      file: ./changes/07-add-payment-table.yaml

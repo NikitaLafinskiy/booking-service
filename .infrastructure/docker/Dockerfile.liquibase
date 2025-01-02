@@ -1,0 +1,6 @@
+FROM liquibase:4.30.0-alpine
+
+WORKDIR /liquibase/
+
+COPY ./src/main/resources/db/changelog/ /liquibase/changelog/
+COPY ./src/main/resources/db/changelog/changes /liquibase/lib/changes/

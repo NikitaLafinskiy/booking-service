@@ -29,6 +29,8 @@ import org.springframework.web.cors.CorsConfiguration;
 @RequiredArgsConstructor
 public class SecurityConfig {
     public static final RouteMatch[] OPEN_ROUTES = new RouteMatch[]{
+            new RouteMatch("/actuator/health/**", HttpMethod.GET),
+            new RouteMatch("/health/**", HttpMethod.GET),
             new RouteMatch("/auth/**", null),
             new RouteMatch("/accommodations/**", HttpMethod.GET),
             new RouteMatch("/payments/success", HttpMethod.GET),
