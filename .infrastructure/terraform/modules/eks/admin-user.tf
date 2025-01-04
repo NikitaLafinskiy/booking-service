@@ -75,7 +75,7 @@ resource "aws_iam_policy" "eks_assume_admin_policy" {
 
 resource "aws_iam_user_policy_attachment" "eks_admin_policy_attachment" {
   user       = aws_iam_user.admin_user.name
-  policy_arn = aws_iam_policy.eks_admin_policy.arn
+  policy_arn = aws_iam_policy.eks_assume_admin_policy.arn
 }
 
 resource "aws_eks_access_entry" "admin_entry" {

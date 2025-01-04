@@ -1,13 +1,5 @@
-terraform {
-  required_providers {
-    helm = {
-      source  = "hashicorp/helm"
-      version = "2.14.0"
-    }
-  }
-}
 resource "aws_iam_role" "cluster_autoscaler_role" {
-  name = "test_role"
+  name = "cluster_autoscaler_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -61,7 +53,7 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler_policy_attachment"
   policy_arn = aws_iam_policy.cluster_autoscaler_policy.arn
 }
 
-resource "aws_eks_pod_identity_association" "example" {
+resource "aws_eks_pod_identity_association" "cluster_autoscaler_identity" {
   cluster_name    = aws_eks_cluster.eks.name
   namespace       = "kube-system"
   service_account = "cluster-autoscaler"

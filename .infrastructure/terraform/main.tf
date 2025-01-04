@@ -17,3 +17,13 @@ module "eks" {
   region                     = local.region
   depends_on                 = [module.network]
 }
+
+module "lb" {
+  source = "./modules/lb"
+  eks_name = local.eks_name
+}
+
+module "ebs" {
+  source = "./modules/ebs"
+  eks_name = local.eks_name
+}

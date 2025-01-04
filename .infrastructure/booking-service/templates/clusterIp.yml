@@ -8,5 +8,5 @@ spec:
   selector:
       app: {{ .Chart.Name }}-pod
   ports:
-    - port: 8080
+    - port: {{ .Values.clusterIp.port }}
       targetPort: 8080

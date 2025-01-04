@@ -34,6 +34,12 @@ applicationConfig:
     serverDomain: http://localhost:8080/api
     clientDomain: http://localhost:3000
 
+clusterIp:
+  port: 8080
+
+ingress:
+  host: ""
+
 bookingService:
   image:
     repository: 578748851450.dkr.ecr.eu-central-1.amazonaws.com/booking-service

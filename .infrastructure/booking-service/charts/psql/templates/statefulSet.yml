@@ -52,6 +52,7 @@ spec:
       metadata:
         name: {{ .Chart.Name }}-pvc
       spec:
+        storageClassName: ebs-sc
         accessModes:
           - ReadWriteOnce
         resources:
