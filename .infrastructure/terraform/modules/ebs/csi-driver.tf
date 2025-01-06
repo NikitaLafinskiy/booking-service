@@ -37,7 +37,7 @@ resource "aws_iam_policy" "ebs_encryption_policy" {
           "kms:ListGrants",
           "kms:RevokeGrant"
         ],
-        "Resource": ["custom-key-arn"],
+        "Resource": ["*"],
         "Condition": {
           "Bool": {
             "kms:GrantIsForAWSResource": "true"
@@ -53,7 +53,7 @@ resource "aws_iam_policy" "ebs_encryption_policy" {
           "kms:GenerateDataKey*",
           "kms:DescribeKey"
         ],
-        "Resource": ["custom-key-arn"]
+        "Resource": ["*"]
       }
     ]
   })

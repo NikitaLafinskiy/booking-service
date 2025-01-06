@@ -1,6 +1,6 @@
 resource "aws_eks_node_group" "cluster_nodes" {
   cluster_name    = aws_eks_cluster.eks.name
-  node_group_name = "general-${var.environment}-${var.eks_name}-eks-node-group"
+  node_group_name = "general-${var.eks_name}-node-group"
   node_role_arn   = aws_iam_role.node_group_role.arn
   version = var.k8s_version
 
@@ -31,7 +31,7 @@ resource "aws_eks_node_group" "cluster_nodes" {
 }
 
 resource "aws_iam_role" "node_group_role" {
-  name = "${var.environment}-${var.eks_name}-eks-node-group-role"
+  name = "${var.eks_name}-node-group-role"
 
   assume_role_policy = jsonencode({
     Statement = [{

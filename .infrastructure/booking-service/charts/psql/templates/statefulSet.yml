@@ -22,7 +22,10 @@ spec:
           volumeMounts:
             - name: {{ .Chart.Name }}-pvc
               mountPath: {{ .Values.statefulSet.volumeMounts.mountPath }}
+              subPath: pgdata
           env:
+            - name: PG_DATA
+              value: {{ .Values.statefulSet.volumeMounts.mountPath }}/pgdata
             {{- range $k, $v := .Values.db }}
             - name: {{ $k }}
               valueFrom:
@@ -52,7 +55,7 @@ spec:
       metadata:
         name: {{ .Chart.Name }}-pvc
       spec:
-        storageClassName: ebs-sc
+        storageClassName: gp2
         accessModes:
           - ReadWriteOnce
         resources:

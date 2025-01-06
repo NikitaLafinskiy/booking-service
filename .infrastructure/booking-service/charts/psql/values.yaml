@@ -7,9 +7,9 @@ statefulSet:
       repository: 578748851450.dkr.ecr.eu-central-1.amazonaws.com/booking-liquibase
       tag: 1.1.0
   pvc:
-    storage: 1Gi
+    storage: 5Gi
   volumeMounts:
-    mountPath: /var/lib/postgresql/data
+    mountPath: /var/lib/postgresql
   image:
     repository: postgres
     tag: 12-bookworm

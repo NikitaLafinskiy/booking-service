@@ -5,12 +5,15 @@ resource "aws_iam_role" "cluster_autoscaler_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
         Effect = "Allow"
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
         Principal = {
           Service = "pods.eks.amazonaws.com"
         }
-      },
+      }
     ]
   })
 }
@@ -61,7 +64,8 @@ resource "aws_eks_pod_identity_association" "cluster_autoscaler_identity" {
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  chart = "https://kubernetes.github.io/autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart = "cluster-autoscaler"
   name  = "autoscaler"
   namespace = "kube-system"
 
@@ -79,4 +83,6 @@ resource "helm_release" "cluster_autoscaler" {
     name  = "autoDiscovery.clusterName"
     value = aws_eks_cluster.eks.name
   }
+
+  depends_on = [aws_eks_node_group.cluster_nodes]
 }

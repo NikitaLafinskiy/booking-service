@@ -4,12 +4,13 @@ metadata:
   name: {{ .Chart.Name }}-ingress
   namespace: {{ .Values.common.namespace }}
   annotations:
-    cert-manager.io/issuer: {{ .Chart }}-letsencrypt-cluster-issuer
+    cert-manager.io/cluster-issuer: {{ .Chart.Name }}-letsencrypt-cluster-issuer
 spec:
   tls:
     - secretName: {{ .Chart.Name }}-tls
       hosts:
         - {{ .Values.ingress.host }}
+  ingressClassName: external-nginx
   rules:
     - host: {{ .Values.ingress.host }}
       http:
@@ -21,5 +22,3 @@ spec:
                 name: {{ .Chart.Name }}-cluster-ip
                 port:
                   number: {{ .Values.clusterIp.port }}
-
-

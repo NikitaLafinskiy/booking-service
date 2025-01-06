@@ -15,15 +15,21 @@ module "eks" {
   k8s_rbac_viewer_group_name = "booking-service-viewer"
   k8s_rbac_admin_group_name  = "booking-service-admin"
   region                     = local.region
-  depends_on                 = [module.network]
+
+  depends_on = [module.network]
 }
 
 module "lb" {
-  source = "./modules/lb"
+  source   = "./modules/lb"
+  vpc_id   = module.network.vpc_id
   eks_name = local.eks_name
+
+  depends_on = [module.eks]
 }
 
 module "ebs" {
-  source = "./modules/ebs"
+  source   = "./modules/ebs"
   eks_name = local.eks_name
+
+  depends_on = [module.eks]
 }

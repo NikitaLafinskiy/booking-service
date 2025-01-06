@@ -5,7 +5,10 @@ resource "aws_iam_role" "lb_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
         Effect = "Allow"
         Principal = {
           Service = "pods.eks.amazonaws.com"
@@ -16,7 +19,7 @@ resource "aws_iam_role" "lb_role" {
 }
 
 resource "aws_iam_policy" "lb_policy" {
-  name = "AWSLoadBalancerControllerIAMPolicy"
+  name = "AWSLoadBalancerController"
   policy = file("${path.module}/policies/lb_policy.json")
 }
 
@@ -33,11 +36,12 @@ resource "aws_eks_pod_identity_association" "lb_eks_pod_identity_association" {
 }
 
 resource "helm_release" "lbc_release" {
-  name  = "lbc_release"
+  name  = "aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
   namespace = "kube-system"
+  version    = "1.8.1"
 
   set {
     name  = "clusterName"
@@ -45,12 +49,12 @@ resource "helm_release" "lbc_release" {
   }
 
   set {
-    name  = "serviceAccount.create"
-    value = "true"
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
   }
 
   set {
-    name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
+    name  = "vpcId"
+    value = var.vpc_id
   }
 }

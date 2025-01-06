@@ -1,5 +1,5 @@
 resource "helm_release" "ingress_nginx" {
-  name       = "ingress_nginx"
+  name       = "external-ingress"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
   namespace = "nginx"
@@ -7,7 +7,7 @@ resource "helm_release" "ingress_nginx" {
   version    = "4.12.0"
 
   values = [
-    file("${path.module}/values/ingress_nginx_values.yaml}")
+    file("${path.module}/values/ingress_nginx_values.yaml")
   ]
 
   depends_on = [helm_release.lbc_release]

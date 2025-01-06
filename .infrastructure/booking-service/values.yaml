@@ -38,7 +38,7 @@ clusterIp:
   port: 8080
 
 ingress:
-  host: ""
+  host: api.serenify.net
 
 bookingService:
   image:
