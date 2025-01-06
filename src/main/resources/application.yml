@@ -1,0 +1,56 @@
+spring:
+  liquibase:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    open-in-view: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/booking
+    username: postgres
+    password: password
+  application:
+    name: booking-service
+  threads:
+    virtual:
+      enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+server:
+  port: 8080
+  servlet:
+      context-path: /api
+
+app:
+  server-domain: http://localhost:8080/api
+  client-domain: http://localhost:3000
+
+jwt:
+  access-secret: ed38a01ceb430a4225f42b65ddf6d962748f8df5ad845ddd87d45f08b4d46fc5
+  refresh-secret: 696b70b80b127a8cdfce4058dbe95217bfe08a19a951b3616743ef802fca8454
+  refresh-expiration: 2678400000
+  access-expiration: 900000
+  
+telegram:
+  bot-token: 7845649954:AAFwBFMEghkJi7iDXLrpFTkcTtu_5_Fmvjs
+
+stripe:
+    secret-key: sk_test_51HtaHsGpWVsd6jizvdVpBrKLwnIBDTNVnej78jilqgJjm6AcgnxN7AGTo9DntzZlb0uiWO8DR27odlDIubaA9xa600mnI5BVwP
+    default-currency: usd
+

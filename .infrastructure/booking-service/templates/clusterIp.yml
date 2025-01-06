@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-cluster-ip
+  namespace: {{ .Values.common.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+      app: {{ .Chart.Name }}-pod
+  ports:
+    - port: {{ .Values.clusterIp.port }}
+      targetPort: 8080

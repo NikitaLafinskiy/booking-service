@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Chart.Name }}-liquibase-job-{{ .Release.Revision }}
+  namespace: {{ .Values.common.namespace }}
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      initContainers:
+        - name: psql-pod-wait
+          image: postgres:12-alpine
+          command:
+            - /bin/sh
+            - -c
+            - "until pg_isready -h psql-stateful-set-0.psql-headless-cluster-ip; do echo waiting for database; sleep 2; done"
+      containers:
+        - name: {{ .Chart.Name}}-liquibase
+          image: {{ .Values.statefulSet.liquibase.image.repository }}:{{ .Values.statefulSet.liquibase.image.tag }}
+          command: [ "liquibase",
+                     "update",
+                     "--driver=org.postgresql.Driver",
+                     "--changeLogFile=changelog/db.changelog-master.yaml",
+                     "--url={{ .Values.db.LIQUIBASE_URL }}",
+                     "--username={{ .Values.db.POSTGRES_USER }}",
+                     "--password={{ .Values.db.POSTGRES_PASSWORD }}" ]
+          imagePullPolicy: Always
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: ecr-secret

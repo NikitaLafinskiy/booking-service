@@ -1,0 +1,65 @@
+common:
+  namespace: booking-service
+
+global:
+  ecr:
+    password: placeholder
+  environment: local
+
+psql:
+  db:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: password
+    POSTGRES_DB: booking
+    LIQUIBASE_URL: jdbc:postgresql://psql-stateful-set-0.psql-headless-cluster-ip:5432/booking
+
+applicationSecret:
+  DB_USERNAME: postgres
+  DB_PASSWORD: password
+  JWT_ACCESS_SECRET: ed38a01ceb430a4225f42b65ddf6d962748f8df5ad845ddd87d45f08b4d46fc5
+  JWT_REFRESH_SECRET: 696b70b80b127a8cdfce4058dbe95217bfe08a19a951b3616743ef802fca8454
+  TELEGRAM_BOT_TOKEN: 7845649954:AAFwBFMEghkJi7iDXLrpFTkcTtu_5_Fmvjs
+  STRING_SECRET_KEY: sk_test_51HtaHsGpWVsd6jizvdVpBrKLwnIBDTNVnej78jilqgJjm6AcgnxN7AGTo9DntzZlb0uiWO8DR27odlDIubaA9xa600mnI5BVwP
+
+applicationConfig:
+  datasource:
+    database: booking
+  data:
+    redis:
+      host: redis-stateful-set-0.redis-headless-cluster-ip.redis.svc.cluster.local
+      port: 6379
+  server:
+    port: 8080
+  app:
+    serverDomain: http://localhost:8080/api
+    clientDomain: http://localhost:3000
+
+clusterIp:
+  port: 8080
+
+ingress:
+  host: api.serenify.net
+
+bookingService:
+  image:
+    repository: 578748851450.dkr.ecr.eu-central-1.amazonaws.com/booking-service
+    tag: 1.1.0
+  replicaCount: 2
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+  applicationYmlMountPath: /usr/app/config/application.yml
+  hpa:
+    minReplicas: 1
+    maxReplicas: 10
+    memory:
+      averageUtilization: 50
+    cpu:
+      averageUtilization: 50
+  db:
+    connectionUrl: psql-stateful-set-0.psql-headless-cluster-ip.psql.svc.cluster.local
+    connectionPort: 5432
+
+rbac:
+  viewerGroup: booking-service-viewer
+  adminGroup: booking-service-admin

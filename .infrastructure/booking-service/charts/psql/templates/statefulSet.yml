@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}-stateful-set
+  namespace: {{ .Values.common.namespace }}
+spec:
+  serviceName: {{ .Chart.Name }}-headless-cluster-ip
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-pod
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-container
+          image: {{ .Values.statefulSet.image.repository }}:{{ .Values.statefulSet.image.tag }}
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: {{ .Chart.Name }}-pvc
+              mountPath: {{ .Values.statefulSet.volumeMounts.mountPath }}
+              subPath: pgdata
+          env:
+            - name: PG_DATA
+              value: {{ .Values.statefulSet.volumeMounts.mountPath }}/pgdata
+            {{- range $k, $v := .Values.db }}
+            - name: {{ $k }}
+              valueFrom:
+                secretKeyRef:
+                  key: {{ $k }}
+                  name: {{ $.Chart.Name }}-secret
+            {{- end}}
+          readinessProbe:
+            exec:
+              command:
+                  - /bin/sh
+                  - -c
+                  - pg_isready -U {{ .Values.db.POSTGRES_USER }} -d {{ .Values.db.POSTGRES_DB }} -h localhost
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                  - /bin/sh
+                  - -c
+                  - pg_isready -U {{ .Values.db.POSTGRES_USER }} -d {{ .Values.db.POSTGRES_DB }} -h localhost
+            initialDelaySeconds: 30
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - kind: PersistentVolumeClaim
+      apiVersion: v1
+      metadata:
+        name: {{ .Chart.Name }}-pvc
+      spec:
+        storageClassName: gp2
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.statefulSet.pvc.storage }}
