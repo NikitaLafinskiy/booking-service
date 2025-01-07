@@ -7,7 +7,7 @@ on:
       options:
         description: 'Options for the workflow'
         required: true
-        type: string
+        type: options
         options:
           - 'apply'
           - 'destroy'
