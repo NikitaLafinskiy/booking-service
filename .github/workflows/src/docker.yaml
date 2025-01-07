@@ -1,0 +1,40 @@
+name: Docker CI
+run-name: ${{ github.ref_name }}-${{ github.actor }}
+
+on:
+  workflow_call:
+    inputs:
+      docker-image:
+        type: string
+        required: true
+      docker-file:
+        type: string
+        required: true
+
+jobs:
+  docker-ci:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Download Docker artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-artifacts
+
+      - name: Download Java artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: java-artifacts
+
+      - name: Login to ECR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
+          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Build Liquibase Docker image
+        run: |
+          cd .infrastructure/docker
+          docker build -t ${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ inputs.docker-image }}:${{ github.sha }} ../../ -f ${{ inputs.docker-file }}
+          docker push ${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ inputs.docker-image }}:${{ github.sha }}
