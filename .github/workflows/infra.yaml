@@ -86,4 +86,4 @@ jobs:
     needs: [update-eks-secret]
     if: ${{ inputs.options == 'apply' }}
     secrets: inherit
-    uses: ./.github/workflows/src/deploy.yaml
+    uses: ./.github/workflows/deploy.yaml

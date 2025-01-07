@@ -49,14 +49,14 @@ jobs:
   java-ci:
     needs: [detect-changes]
     secrets: inherit
-    uses: ./.github/workflows/src/java.yaml
+    uses: ./.github/workflows/java.yaml
 
   src-docker-ci:
     needs: [java-ci]
     secrets: inherit
     if: ${{ needs.detect-changes.outputs.java == 'true' }}
 
-    uses: ./.github/workflows/src/docker.yaml
+    uses: ./.github/workflows/docker.yaml
     with:
       docker-file: Dockerfile
       docker-image: booking-service
@@ -66,7 +66,7 @@ jobs:
     secrets: inherit
     if: ${{ needs.detect-changes.outputs.db == 'true' }}
 
-    uses: ./.github/workflows/src/docker.yaml
+    uses: ./.github/workflows/docker.yaml
     with:
       docker-file: Dockerfile.liquibase
       docker-image: booking-liquibase
@@ -75,11 +75,11 @@ jobs:
     needs: [java-ci]
     secrets: inherit
     if: ${{ needs.detect-changes.outputs.db == 'true' || needs.detect-changes.outputs.java == 'true' || needs.detect-changes.outputs.helm == 'true' }}
-    uses: ./.github/workflows/src/helm.yaml
+    uses: ./.github/workflows/helm.yaml
 
   deploy-helm:
     needs: [java-ci, src-docker-ci, liquibase-docker-ci, helm-ci]
     if: ${{ needs.detect-changes.outputs.db == 'true' || needs.detect-changes.outputs.java == 'true' || needs.detect-changes.outputs.helm == 'true' }}
     secrets: inherit
-    uses: ./.github/workflows/src/deploy.yaml
+    uses: ./.github/workflows/deploy.yaml
 
