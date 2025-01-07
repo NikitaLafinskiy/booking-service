@@ -89,7 +89,6 @@ jobs:
           SECRET_VALUE: ${{ needs.terraform.outputs.eks_url }}
 
   deploy:
-    runs-on: ubuntu-22.04
     needs: [update-eks-secret]
     if: ${{ inputs.options == 'apply' }}
     secrets: inherit
