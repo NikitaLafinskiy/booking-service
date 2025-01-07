@@ -59,12 +59,12 @@ jobs:
         if: ${{ inputs.options == 'validate' }}
         run: terraform validate
 
-  deploy:
+  update-eks-secret:
     runs-on: ubuntu-22.04
     needs: terraform
     defaults:
         run:
-          working-directory: .infrastructure/ansible
+          working-directory: .infrastructure/terraform
     if: ${{ inputs.options == 'apply' }}
     env:
       GITHUB_OWNER: ${{ github.repository_owner }}
@@ -72,9 +72,6 @@ jobs:
       ACCESS_TOKEN_GITHUB: ${{ secrets.ACCESS_TOKEN_GITHUB }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Create or update Github Actions secret
         uses: ekowcharles/update-github-actions-secret@v1
         env:
@@ -84,6 +81,9 @@ jobs:
           SECRET_NAME: EKS_CLUSTER_NAME
           SECRET_VALUE: ${{ needs.terraform.outputs.eks_url }}
 
-      - name: Deploy Helm to EKS
-        secrets: inherit
-        uses: ./.github/workflows/src/deploy.yaml
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: [update-eks-secret]
+    if: ${{ inputs.options == 'apply' }}
+    secrets: inherit
+    uses: ./.github/workflows/deploy.yaml
