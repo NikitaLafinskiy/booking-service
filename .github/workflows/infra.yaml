@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       options:
-        description: 'Options for the workflow'
+        description: 'Choose a Terraform action'
         required: true
         type: options
         options:
@@ -29,6 +29,13 @@ jobs:
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        name: Configure AWS credentials
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Init Terraform
         run: terraform init
