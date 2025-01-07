@@ -1,0 +1,54 @@
+name: Deploy CI
+run-name: ${{ github.ref_name }}-${{ github.actor }}
+
+on:
+  workflow_call:
+    inputs:
+      helm-values-path:
+        type: string
+        required: false
+        default: './values.yaml'
+
+jobs:
+  deploy-helm:
+    name: Deploy Helm
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: helm-chart
+          path: .
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.2.0
+
+      - name: Setup KubeCTL
+        uses: azure/setup-kubectl@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        name: Configure AWS credentials
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Configure Kubernetes client
+        uses: silverlyra/setup-aws-eks@v0.1
+        with:
+          cluster: ${{ secrets.EKS_CLUSTER_NAME }}
+
+      - name: Deploy Helm to Development
+        run: |
+          helm upgrade --install --atomic --wait --timeout 3600s --debug booking-service ./*.tgz \
+          -f ${{ inputs.helm-values-path }}
+          --set applicationSecret.DB_USERNAME=${{ secrets.DB_USERNAME }} \
+          --set applicationSecret.DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          --set psql.db.POSTGRES_USER=${{ secrets.DB_USERNAME }} \
+          --set psql.db.POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          --set applicationSecret.JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }} \
+          --set applicationSecret.JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }} \
+          --set applicationSecret.TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} \
+          --set applicationSecret.STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }} \
+          --set bookingService.image.tag=${{ github.sha }} \
+          --set statefulSet.liquibase.image.tag=${{ github.sha }} \

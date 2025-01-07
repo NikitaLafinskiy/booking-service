@@ -1,0 +1,36 @@
+name: Helm CI
+run-name: ${{ github.ref_name }}-${{ github.actor }}
+
+on:
+  workflow_call:
+
+jobs:
+  helm-ci:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: .infrastructure/booking-service
+
+    steps:
+      - name: Download Helm artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: helm-artifacts
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.2.0
+
+      - name: Helm lint
+        run: helm lint .
+
+      - name: Helm Template
+        run: helm template . -f ./values.yml
+
+      - name: Helm Package
+        run: helm package .
+
+      - name: Upload Helm chart
+        uses: actions/upload-artifact@v4
+        with:
+          name: helm-chart
+          path: ./*.tgz

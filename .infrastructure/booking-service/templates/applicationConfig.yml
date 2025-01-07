@@ -58,5 +58,5 @@ data:
           bot-token: ${TELEGRAM_BOT_TOKEN}
 
         stripe:
-            secret-key: ${STRING_SECRET_KEY}
+            secret-key: ${STRIPE_SECRET_KEY}
             default-currency: usd

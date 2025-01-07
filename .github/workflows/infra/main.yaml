@@ -1,0 +1,89 @@
+name: Infra CI
+run-name: ${{ github.ref_name }}-${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      options:
+        description: 'Options for the workflow'
+        required: true
+        type: string
+        options:
+          - 'apply'
+          - 'destroy'
+          - 'plan'
+          - 'validate'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-22.04
+    outputs:
+      eks_url: ${{ steps.eks_endpoint.outputs.eks_url }}
+    defaults:
+        run:
+          working-directory: .infrastructure/terraform
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Init Terraform
+        run: terraform init
+
+      - name: Format code
+        run: terraform fmt
+
+      - name: Apply changes
+        if: ${{ inputs.options == 'apply' }}
+        run: terraform apply -auto-approve
+
+      - name: Output EKS endpoint
+        id: eks_endpoint
+        if: ${{ inputs.options == 'apply' }}
+        run: |
+          EKS_URL=$(terraform output -raw eks_cluster_endpoint)
+          echo "eks_url=$EKS_URL" >> $GITHUB_OUTPUT
+
+      - name: Destroy changes
+        if: ${{ inputs.options == 'destroy' }}
+        run: terraform destroy -auto-approve
+
+      - name: Plan changes4
+        if: ${{ inputs.options == 'plan' }}
+        run: terraform plan
+
+      - name: Validate changes
+        if: ${{ inputs.options == 'validate' }}
+        run: terraform validate
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: terraform
+    defaults:
+        run:
+          working-directory: .infrastructure/ansible
+    if: ${{ inputs.options == 'apply' }}
+    env:
+      GITHUB_OWNER: ${{ github.repository_owner }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      ACCESS_TOKEN_GITHUB: ${{ secrets.ACCESS_TOKEN_GITHUB }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create or update Github Actions secret
+        uses: ekowcharles/update-github-actions-secret@v1
+        env:
+          OWNER: ${{ env.GITHUB_OWNER }}
+          REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
+          ACCESS_TOKEN: ${{ env.ACCESS_TOKEN_GITHUB }}
+          SECRET_NAME: EKS_CLUSTER_NAME
+          SECRET_VALUE: ${{ needs.terraform.outputs.eks_url }}
+
+      - name: Deploy Helm to EKS
+        secrets: inherit
+        uses: ./.github/workflows/src/deploy.yaml
