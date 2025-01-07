@@ -7,8 +7,6 @@ concurrency:
 
 on:
   pull_request:
-    paths:
-      - ../../../src/main/java
     branches:
       - main
   workflow_dispatch:
