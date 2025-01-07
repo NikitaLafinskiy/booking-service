@@ -17,6 +17,7 @@ jobs:
     outputs:
       java: ${{ steps.changes.outputs.java }}
       db: ${{ steps.changes.outputs.db }}
+      helm: ${{ steps.changes.outputs.helm }}
 
     steps:
       - name: Checkout code
@@ -37,6 +38,12 @@ jobs:
             echo "db=true" >> $GITHUB_OUTPUT
           else
             echo "db=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if git diff --name-only HEAD^ HEAD | grep -q "^.infrastructure/booking-service/"; then
+            echo "helm=true" >> $GITHUB_OUTPUT
+          else
+            echo "helm=false" >> $GITHUB_OUTPUT
           fi
 
   java-ci:
@@ -67,10 +74,12 @@ jobs:
   helm-ci:
     needs: [java-ci]
     secrets: inherit
+    if: ${{ needs.detect-changes.outputs.db == 'true' || needs.detect-changes.outputs.java == 'true' || needs.detect-changes.outputs.helm == 'true' }}
     uses: ./.github/workflows/src/helm.yaml
 
   deploy-helm:
     needs: [java-ci, src-docker-ci, liquibase-docker-ci, helm-ci]
+    if: ${{ needs.detect-changes.outputs.db == 'true' || needs.detect-changes.outputs.java == 'true' || needs.detect-changes.outputs.helm == 'true' }}
     secrets: inherit
     uses: ./.github/workflows/src/deploy.yaml
 
