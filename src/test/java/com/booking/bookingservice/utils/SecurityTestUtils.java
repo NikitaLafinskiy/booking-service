@@ -29,17 +29,4 @@ public class SecurityTestUtils {
                         setUpAdminAuthorities());
         return tokenService.generateToken(authentication, TokenService.TokenType.ACCESS);
     }
-
-    public static String setUpRefreshToken(TokenService tokenService) {
-        UserDto userDto = setUpAdminUserDto();
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        userDto,
-                        null,
-                        setUpAdminAuthorities());
-        String refreshToken = tokenService.generateToken(authentication,
-                TokenService.TokenType.REFRESH);
-        tokenService.saveRefreshToken(refreshToken, userDto.getEmail());
-        return refreshToken;
-    }
 }

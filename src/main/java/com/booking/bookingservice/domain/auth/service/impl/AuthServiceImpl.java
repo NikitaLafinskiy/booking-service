@@ -2,6 +2,7 @@ package com.booking.bookingservice.domain.auth.service.impl;
 
 import com.booking.bookingservice.domain.auth.dto.LoginResponseDto;
 import com.booking.bookingservice.domain.auth.dto.LoginUserRequestDto;
+import com.booking.bookingservice.domain.auth.dto.RefreshTokenRequestDto;
 import com.booking.bookingservice.domain.auth.dto.RegisterUserRequestDto;
 import com.booking.bookingservice.domain.auth.mapper.AuthMapper;
 import com.booking.bookingservice.domain.auth.service.AuthService;
@@ -13,6 +14,7 @@ import com.booking.bookingservice.domain.user.model.User;
 import com.booking.bookingservice.domain.user.repository.RoleRepository;
 import com.booking.bookingservice.domain.user.repository.UserRepository;
 import com.booking.bookingservice.exception.EntityNotFoundException;
+import com.booking.bookingservice.exception.UnauthorizedException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -65,5 +67,33 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return userMapper.toDto(user);
+    }
+
+    @Override
+    public LoginResponseDto refresh(RefreshTokenRequestDto refreshTokenRequestDto) {
+        String refreshToken = refreshTokenRequestDto.getRefreshToken();
+
+        boolean isValid;
+        try {
+            isValid = tokenService.validateToken(refreshToken, TokenService.TokenType.REFRESH);
+        } catch (Exception e) {
+            isValid = false;
+        }
+        if (!isValid) {
+            throw new UnauthorizedException("Invalid or expired refresh token");
+        }
+
+        Authentication authentication = tokenService.getAuthentication(refreshToken,
+                TokenService.TokenType.REFRESH);
+        String newAccessToken = tokenService.generateToken(authentication,
+                TokenService.TokenType.ACCESS);
+        String newRefreshToken = tokenService.generateToken(authentication,
+                TokenService.TokenType.REFRESH);
+
+        tokenService.deleteRefreshToken(refreshToken);
+        tokenService.saveRefreshToken(newRefreshToken,
+                ((UserDto) authentication.getPrincipal()).getEmail());
+
+        return new LoginResponseDto(newAccessToken, newRefreshToken);
     }
 }

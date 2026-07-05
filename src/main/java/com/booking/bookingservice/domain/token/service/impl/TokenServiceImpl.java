@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -60,6 +61,10 @@ public class TokenServiceImpl implements TokenService {
         refreshTokenRepository.save(new RefreshToken(token, user));
     }
 
+    public void deleteRefreshToken(String token) {
+        refreshTokenRepository.findByToken(token).ifPresent(refreshTokenRepository::delete);
+    }
+
     public String generateToken(Authentication authentication,
                                         TokenType tokenType) {
         UserDto principal = (UserDto) authentication.getPrincipal();
@@ -94,6 +99,13 @@ public class TokenServiceImpl implements TokenService {
                 .build()
                 .parseSignedClaims(token);
         return claimsJws.getPayload().getExpiration().after(new Date());
+    }
+
+    public Authentication getAuthentication(String token, TokenType tokenType) {
+        return new UsernamePasswordAuthenticationToken(
+                getUserDtoFromToken(token, tokenType),
+                null,
+                getAuthoritiesFromToken(token, tokenType));
     }
 
     public UserDto getUserDtoFromToken(String token, TokenService.TokenType tokenType) {

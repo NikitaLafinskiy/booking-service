@@ -8,9 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 public interface TokenService {
     void saveRefreshToken(String token, String user);
 
+    void deleteRefreshToken(String token);
+
     String generateToken(Authentication authentication, TokenService.TokenType tokenType);
 
     boolean validateToken(String token, TokenService.TokenType tokenType);
+
+    Authentication getAuthentication(String token, TokenService.TokenType tokenType);
 
     UserDto getUserDtoFromToken(String token, TokenService.TokenType tokenType);
 
