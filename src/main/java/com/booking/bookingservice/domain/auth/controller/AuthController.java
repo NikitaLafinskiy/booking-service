@@ -2,6 +2,7 @@ package com.booking.bookingservice.domain.auth.controller;
 
 import com.booking.bookingservice.domain.auth.dto.LoginResponseDto;
 import com.booking.bookingservice.domain.auth.dto.LoginUserRequestDto;
+import com.booking.bookingservice.domain.auth.dto.RefreshTokenRequestDto;
 import com.booking.bookingservice.domain.auth.dto.RegisterUserRequestDto;
 import com.booking.bookingservice.domain.auth.service.AuthService;
 import com.booking.bookingservice.domain.user.dto.UserDto;
@@ -49,5 +50,20 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto register(@RequestBody @Valid RegisterUserRequestDto registerUserRequestDto) {
         return authService.register(registerUserRequestDto);
+    }
+
+    @Operation(summary = "Refresh",
+            description = "Exchange a valid refresh token for a new access and refresh token pair",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Tokens refreshed successfully"),
+                    @ApiResponse(responseCode = "401",
+                            description = "Invalid or expired refresh token"),
+            }
+    )
+    @PostMapping("/refresh")
+    public LoginResponseDto refresh(
+            @RequestBody @Valid RefreshTokenRequestDto refreshTokenRequestDto) {
+        return authService.refresh(refreshTokenRequestDto);
     }
 }

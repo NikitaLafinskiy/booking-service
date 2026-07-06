@@ -2,7 +2,7 @@ package com.booking.bookingservice.config;
 
 import com.booking.bookingservice.domain.security.filter.JwtAuthenticationFilter;
 import com.booking.bookingservice.exception.handler.ExceptionHandlerFilter;
-import java.util.Arrays;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -81,14 +81,20 @@ public class SecurityConfig {
                     ))
                     .addFilterBefore(jwtAuthenticationFilter,
                             UsernamePasswordAuthenticationFilter.class)
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(Arrays.stream(OPEN_ROUTES)
-                                    .map(RouteMatch::path)
-                                    .toArray(String[]::new))
-                            .permitAll()
-                            .anyRequest()
-                            .authenticated()
-                    )
+                    .authorizeHttpRequests(auth -> {
+                        for (RouteMatch route : OPEN_ROUTES) {
+                            if (route.method() != null) {
+                                auth.requestMatchers(route.method(), route.path()).permitAll();
+                            } else {
+                                auth.requestMatchers(route.path()).permitAll();
+                            }
+                        }
+                        auth.anyRequest().authenticated();
+                    })
+                    .exceptionHandling(exceptionHandling -> exceptionHandling
+                            .authenticationEntryPoint((request, response, authException) ->
+                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                                            authException.getMessage())))
                     .addFilterBefore(exceptionHandlerFilter, LogoutFilter.class);
             return httpSecurity.build();
         } catch (Exception e) {

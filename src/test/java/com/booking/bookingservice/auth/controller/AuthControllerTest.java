@@ -14,10 +14,12 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 import com.booking.bookingservice.domain.auth.dto.LoginResponseDto;
 import com.booking.bookingservice.domain.auth.dto.LoginUserRequestDto;
+import com.booking.bookingservice.domain.auth.dto.RefreshTokenRequestDto;
 import com.booking.bookingservice.domain.auth.dto.RegisterUserRequestDto;
 import com.booking.bookingservice.domain.token.service.TokenService;
 import com.booking.bookingservice.domain.user.dto.UserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -148,6 +152,86 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest)
                 )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("""
+            Given a valid refresh token
+            When POST request is sent to /auth/refresh
+            Then return a LoginResponseDto with a new access and refresh token
+            """)
+    void refresh_validRefreshToken_returnLoginResponseDto() throws Exception {
+        // Given
+        RefreshTokenRequestDto refreshTokenRequestDto = new RefreshTokenRequestDto()
+                .setRefreshToken("oldRefreshToken");
+        LoginResponseDto expected = setUpLoginResponseDto();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                setUpNonExistantUserDto(),
+                null,
+                List.of());
+
+        when(tokenService.validateToken("oldRefreshToken", TokenService.TokenType.REFRESH))
+                .thenReturn(true);
+        when(tokenService.getAuthentication("oldRefreshToken", TokenService.TokenType.REFRESH))
+                .thenReturn(authentication);
+        when(tokenService.generateToken(any(), eq(TokenService.TokenType.ACCESS)))
+                .thenReturn(expected.accessToken());
+        when(tokenService.generateToken(any(), eq(TokenService.TokenType.REFRESH)))
+                .thenReturn(expected.refreshToken());
+
+        // When
+        MvcResult mvcResult = mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Then
+        LoginResponseDto actual = objectMapper.readValue(
+                mvcResult.getResponse()
+                        .getContentAsString(),
+                LoginResponseDto.class);
+
+        assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
+    }
+
+    @Test
+    @DisplayName("""
+            Given an invalid or expired refresh token
+            When POST request is sent to /auth/refresh
+            Then return 401 Unauthorized
+            """)
+    void refresh_invalidRefreshToken_returnUnauthorized() throws Exception {
+        // Given
+        RefreshTokenRequestDto refreshTokenRequestDto = new RefreshTokenRequestDto()
+                .setRefreshToken("invalidRefreshToken");
+
+        when(tokenService.validateToken("invalidRefreshToken", TokenService.TokenType.REFRESH))
+                .thenReturn(false);
+
+        // When
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("""
+            Given a blank refresh token
+            When POST request is sent to /auth/refresh
+            Then return 400 Bad Request
+            """)
+    void refresh_blankRefreshToken_returnBadRequest() throws Exception {
+        // Given
+        RefreshTokenRequestDto refreshTokenRequestDto = new RefreshTokenRequestDto()
+                .setRefreshToken("");
+
+        // When
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshTokenRequestDto)))
                 .andExpect(status().isBadRequest());
     }
 }

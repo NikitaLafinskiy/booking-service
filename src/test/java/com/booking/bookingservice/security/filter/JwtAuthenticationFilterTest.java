@@ -2,17 +2,15 @@ package com.booking.bookingservice.security.filter;
 
 import static com.booking.bookingservice.utils.AccommodationTestUtils.setUpMutateAccommodationRequestDto;
 import static com.booking.bookingservice.utils.SecurityTestUtils.setUpAccessToken;
-import static com.booking.bookingservice.utils.SecurityTestUtils.setUpRefreshToken;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import com.booking.bookingservice.config.WithJwtMockUser;
 import com.booking.bookingservice.domain.accommodation.dto.MutateAccommodationRequestDto;
-import com.booking.bookingservice.domain.security.filter.JwtAuthenticationFilter;
 import com.booking.bookingservice.domain.token.service.TokenService;
-import com.booking.bookingservice.exception.handler.ExceptionHandlerFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +27,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest()
 @Testcontainers
 public class JwtAuthenticationFilterTest {
-    public static final String REFRESH_TOKEN_HEADER = "Refresh-Token";
     private static MockMvc mockMvc;
 
     @Autowired
@@ -39,12 +36,9 @@ public class JwtAuthenticationFilterTest {
     private TokenService tokenService;
 
     @BeforeAll
-    static void beforeAll(@Autowired WebApplicationContext context,
-                          @Autowired JwtAuthenticationFilter jwtAuthenticationFilter,
-                          @Autowired ExceptionHandlerFilter exceptionHandlerFilter) {
+    static void beforeAll(@Autowired WebApplicationContext context) {
         mockMvc = webAppContextSetup(context)
-                .addFilter(exceptionHandlerFilter)
-                .addFilter(jwtAuthenticationFilter)
+                .apply(springSecurity())
                 .build();
     }
 
@@ -112,34 +106,27 @@ public class JwtAuthenticationFilterTest {
 
     @Test
     @DisplayName("""
-            Given an invalid access token and a valid refresh token
+            Given an expired access token
             When POST request is sent to a protected endpoint (/accommodations)
-            Then return 401 Unauthorized and refresh tokens
+            Then return 401 Unauthorized without refreshing any tokens
             """)
     @WithJwtMockUser(isAdmin = true)
-    void postAccommodation_invalidAccessTokenValidRefreshToken_returnUnauthorizedRefreshTokens()
-            throws Exception {
+    void postAccommodation_expiredAccessToken_returnUnauthorized() throws Exception {
         // Given
         MutateAccommodationRequestDto mutateAccommodationRequestDto =
                 setUpMutateAccommodationRequestDto();
         String jsonRequest = objectMapper.writeValueAsString(mutateAccommodationRequestDto);
 
-        String refreshToken = setUpRefreshToken(tokenService);
-
         // When
         MvcResult mvcResult = mockMvc.perform(post("/accommodations")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer invalid_token")
-                        .header(REFRESH_TOKEN_HEADER, "Bearer " + refreshToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
         // Then
-        assertNotNull(
-                mvcResult.getResponse()
-                .getHeader(REFRESH_TOKEN_HEADER));
-        assertNotNull(
+        assertNull(
                 mvcResult.getResponse()
                 .getHeader(HttpHeaders.AUTHORIZATION));
     }

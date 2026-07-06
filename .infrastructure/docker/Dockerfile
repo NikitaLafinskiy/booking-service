@@ -1,9 +1,9 @@
-FROM gradle:jdk23-alpine AS builder
+FROM eclipse-temurin:24-jdk-alpine AS builder
 WORKDIR /usr/app/
-COPY . . 
-RUN gradle assemble
+COPY . .
+RUN ./gradlew assemble --no-daemon
 
-FROM openjdk:23-jdk-slim-bookworm
+FROM eclipse-temurin:24-jre-alpine
 
 ARG JAR_NAME=*-SNAPSHOT.jar
 ARG APP_HOME=/usr/app/

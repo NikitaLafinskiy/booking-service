@@ -16,25 +16,27 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Download Docker artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Download Java artifacts
         uses: actions/download-artifact@v4
         with:
           name: java-artifacts
 
-      - name: Login to ECR
-        uses: docker/login-action@v3
+      - uses: aws-actions/configure-aws-credentials@v4
+        name: Configure AWS credentials
         with:
-          registry: ${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
-          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        id: ecr-login
 
       - name: Build Liquibase Docker image
         run: |
           cd .infrastructure/docker
-          docker build -t ${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ inputs.docker-image }}:${{ github.sha }} ../../ -f ${{ inputs.docker-file }}
-          docker push ${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ inputs.docker-image }}:${{ github.sha }}
+          docker build -t ${{ steps.ecr-login.outputs.registry }}/${{ inputs.docker-image }}:${{ github.sha }} ../../ -f ${{ inputs.docker-file }}
+          docker push ${{ steps.ecr-login.outputs.registry }}/${{ inputs.docker-image }}:${{ github.sha }}
