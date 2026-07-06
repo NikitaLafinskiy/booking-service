@@ -3,15 +3,14 @@ package com.booking.bookingservice.security.filter;
 import static com.booking.bookingservice.utils.AccommodationTestUtils.setUpMutateAccommodationRequestDto;
 import static com.booking.bookingservice.utils.SecurityTestUtils.setUpAccessToken;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import com.booking.bookingservice.config.WithJwtMockUser;
 import com.booking.bookingservice.domain.accommodation.dto.MutateAccommodationRequestDto;
-import com.booking.bookingservice.domain.security.filter.JwtAuthenticationFilter;
 import com.booking.bookingservice.domain.token.service.TokenService;
-import com.booking.bookingservice.exception.handler.ExceptionHandlerFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -37,12 +36,9 @@ public class JwtAuthenticationFilterTest {
     private TokenService tokenService;
 
     @BeforeAll
-    static void beforeAll(@Autowired WebApplicationContext context,
-                          @Autowired JwtAuthenticationFilter jwtAuthenticationFilter,
-                          @Autowired ExceptionHandlerFilter exceptionHandlerFilter) {
+    static void beforeAll(@Autowired WebApplicationContext context) {
         mockMvc = webAppContextSetup(context)
-                .addFilter(exceptionHandlerFilter)
-                .addFilter(jwtAuthenticationFilter)
+                .apply(springSecurity())
                 .build();
     }
 

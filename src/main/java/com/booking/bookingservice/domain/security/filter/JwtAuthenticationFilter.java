@@ -1,6 +1,5 @@
 package com.booking.bookingservice.domain.security.filter;
 
-import com.booking.bookingservice.config.SecurityConfig;
 import com.booking.bookingservice.domain.token.service.TokenService;
 import com.booking.bookingservice.exception.JwtAuthenticationException;
 import jakarta.servlet.FilterChain;
@@ -8,39 +7,21 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Service
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final String PATH_PREFIX = "/api/";
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private final TokenService tokenService;
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        AntPathMatcher matcher = new AntPathMatcher();
-        String requestPath = request.getRequestURI();
-
-        return Arrays.stream(SecurityConfig.OPEN_ROUTES)
-                .anyMatch((routeMatch) -> {
-                    if (routeMatch.method() != null
-                            && !(routeMatch.method().name().equals(request.getMethod()))) {
-                        return false;
-                    }
-                    return matcher.match(PATH_PREFIX + routeMatch.path(), requestPath);
-                });
-    }
 
     @Override
     protected void doFilterInternal(
@@ -49,13 +30,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
         String accessToken = extractAccessToken(request);
         if (accessToken == null) {
-            handleAuthenticationFailure("Authentication token is missing");
+            filterChain.doFilter(request, response);
+            return;
         }
 
         try {
             if (tokenService.validateToken(accessToken, TokenService.TokenType.ACCESS)) {
                 processValidAccessToken(accessToken);
                 filterChain.doFilter(request, response);
+            } else {
+                handleAuthenticationFailure("Access token is invalid or expired");
             }
         } catch (Exception exception) {
             handleAuthenticationFailure("Access token is invalid or expired");
