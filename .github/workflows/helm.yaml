@@ -12,10 +12,8 @@ jobs:
         working-directory: .infrastructure/booking-service
 
     steps:
-      - name: Download Helm artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: helm-artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Helm
         uses: azure/setup-helm@v4.2.0
