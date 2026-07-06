@@ -22,7 +22,7 @@ jobs:
         run: helm lint .
 
       - name: Helm Template
-        run: helm template . -f ./values.yml
+        run: helm template . -f ./values.yaml
 
       - name: Helm Package
         run: helm package .
